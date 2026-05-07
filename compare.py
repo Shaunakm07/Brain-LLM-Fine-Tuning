@@ -52,9 +52,6 @@ JUDGE_MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 if torch.cuda.is_available():
     DEVICE = "cuda"
     DTYPE  = torch.float16
-elif torch.backends.mps.is_available():
-    DEVICE = "mps"
-    DTYPE  = torch.float32
 else:
     DEVICE = "cpu"
     DTYPE  = torch.float32
