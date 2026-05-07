@@ -24,14 +24,21 @@ python inference.py
 # Fine-tune with a local LLM judge
 python train.py --criteria "responses should be concise and use simple language"
 
-# Fine-tune with your own prompts
-python train.py --criteria "formal and professional tone" \
-                --prompts "Explain gravity" "What is DNA?" "How do computers work?"
+# Compare base model vs fine-tuned model side by side
+python compare.py --adapter ./lora-adapter --prompts "Explain gravity" "What is DNA?"
+
+# Compare with judge scoring
+python compare.py --adapter ./lora-adapter \
+                  --prompts_file prompts.txt \
+                  --criteria "concise and uses simple language" \
+                  --judge
 ```
 
-`inference.py` runs `Qwen2.5-0.5B-Instruct` locally on CPU (Apple Silicon compatible). See [`inference.py`](inference.py) for details.
+`inference.py` runs `Qwen2.5-0.5B-Instruct` locally. See [`inference.py`](inference.py) for details.
 
 `train.py` fine-tunes the policy model using a separate frozen judge model (`Qwen2.5-1.5B-Instruct`) as the reward signal. See [`docs/reward-maximization.md`](docs/reward-maximization.md) for how it works.
+
+`compare.py` loads both the base model and fine-tuned model and runs them side by side on the same prompts, with optional judge scoring to quantify improvement.
 
 ---
 
