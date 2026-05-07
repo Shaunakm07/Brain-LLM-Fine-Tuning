@@ -1,484 +1,231 @@
 # LoRA Fine-Tuning to Maximise Another Model's Output
 
-This document covers how to fine-tune a small LLM with LoRA such that its outputs maximise the score assigned by a **separate reward model**. This is the core idea behind RLHF and is used in systems like DeepSeek-R1, InstructGPT, and LLM-as-judge pipelines.
+This document explains how `train.py` fine-tunes a small LLM using a second, larger LLM as a reward signal — and why the implementation choices were made.
 
 ---
 
 ## Table of Contents
 
 1. [Concept](#concept)
-2. [Setup](#setup)
-3. [Wrapping Your Reward Model](#wrapping-your-reward-model)
-4. [Method 1 — GRPO (Recommended)](#method-1--grpo-recommended)
-5. [Method 2 — PPO](#method-2--ppo)
-6. [Method 3 — Reward-Weighted SFT](#method-3--reward-weighted-sft)
-7. [Method 4 — DPO (Preference Pairs)](#method-4--dpo-preference-pairs)
-8. [Choosing a Method](#choosing-a-method)
-9. [Hyperparameter Reference](#hyperparameter-reference)
-10. [Common Failure Modes](#common-failure-modes)
+2. [Why Two Different Model Sizes](#why-two-different-model-sizes)
+3. [The Optimisation Method — Advantage-Weighted SFT](#the-optimisation-method--advantage-weighted-sft)
+4. [Why Advantage Instead of Raw Reward](#why-advantage-instead-of-raw-reward)
+5. [Running train.py](#running-trainpy)
+6. [What the Outputs Mean](#what-the-outputs-mean)
+7. [Hyperparameter Guide](#hyperparameter-guide)
+8. [Common Failure Modes](#common-failure-modes)
+9. [Other Methods](#other-methods)
 
 ---
 
 ## Concept
 
-Standard fine-tuning minimises a loss over a fixed dataset. Reward-maximisation fine-tuning instead treats another model as a **live scoring function** and trains the policy model to generate outputs that receive higher scores.
+Standard fine-tuning minimises loss over a fixed dataset. Reward-maximisation fine-tuning uses a second model as a **live scoring function** and trains the policy model to generate outputs that receive higher scores.
 
 ```
 Prompt
   │
   ▼
-Policy Model (LoRA fine-tuned)  ──generates──►  Completion
-                                                     │
-                                                     ▼
-                                            Reward Model (frozen)
-                                                     │
-                                                     ▼
-                                               Scalar Score
-                                                     │
-                                    gradient flows back through policy
+Policy Model (Qwen 0.5B + LoRA)  ──generates──►  Completion
+                                                       │
+                                                       ▼
+                                          Reward Model (Qwen 1.5B, frozen)
+                                                       │
+                                                       ▼
+                                                 Score 1–10
+                                                       │
+                                         Advantage = (score - mean) / std
+                                                       │
+                                         Gradient update to policy LoRA weights
 ```
 
-The reward model is always **frozen**. Only the LoRA adapters on the policy model are updated.
+The reward model is always **frozen** — only the LoRA adapters on the policy model are updated.
 
 ---
 
-## Setup
+## Why Two Different Model Sizes
+
+The reward model needs to be **larger than the policy model** to act as a reliable judge.
+
+Using the same 0.5B model for both roles failed because:
+- A 0.5B model struggles to follow complex judging instructions
+- It produces nearly identical scores for all completions (e.g. always 3, 5, or 7 out of 10)
+- When all completions get the same score, the gradient signal is near-zero and nothing is learned
+
+| Role | Model | Why |
+|------|-------|-----|
+| Policy (trained) | `Qwen2.5-0.5B-Instruct` | Small, fast, efficient to fine-tune with LoRA on CPU |
+| Judge (frozen) | `Qwen2.5-1.5B-Instruct` | 3× larger, follows judging instructions reliably, produces varied scores |
+
+---
+
+## The Optimisation Method — Advantage-Weighted SFT
+
+`train.py` uses **Advantage-Weighted Supervised Fine-Tuning**. It avoids a full RL loop (no PPO value head, no reference model KL penalty), making it stable and simple to run on CPU.
+
+### Training loop per prompt
+
+```
+For each prompt:
+  1. Generate N completions from the current policy  (N = --completions, default 4)
+  2. Score all N completions with the frozen judge
+  3. Compute advantage for each:
+       advantage = (reward - mean(rewards)) / (std(rewards) + ε)
+  4. For each completion:
+       loss = cross_entropy(completion) × advantage
+       backpropagate → update LoRA weights
+```
+
+### Why collect all completions before updating?
+
+You need the mean and std of the *whole group* to compute advantage. If you updated after each completion, the group statistics wouldn't exist yet. So all completions for a prompt are generated and scored first, then all updates happen.
+
+---
+
+## Why Advantage Instead of Raw Reward
+
+The previous approach scaled loss directly by the raw reward:
+
+```
+loss = cross_entropy × reward
+```
+
+**Problem:** if the judge scores all completions similarly (e.g. all 0.7), every gradient update is nearly identical — the model can't tell which completions were relatively better or worse.
+
+The fix is **advantage normalisation**:
+
+```
+advantage = (reward - mean_reward) / std_reward
+loss      = cross_entropy × advantage
+```
+
+Effect on gradients:
+
+| Completion | Reward | Advantage | Effect |
+|------------|--------|-----------|--------|
+| Best in group | 0.9 | +1.4 | Strongly reinforced — model made more likely to produce this |
+| Average | 0.5 | 0.0 | Ignored — no gradient |
+| Worst in group | 0.3 | −1.2 | Suppressed — model made less likely to produce this |
+
+This works even when the judge only uses a narrow score range, because what matters is the **relative difference** within the group, not the absolute values.
+
+---
+
+## Running train.py
+
+### Install dependencies
 
 ```bash
-pip install torch transformers peft trl datasets accelerate bitsandbytes
+pip install torch transformers peft matplotlib
 ```
 
-Base imports used throughout this document:
+### Basic usage
+
+```bash
+# Uses 10 built-in demo prompts
+python train.py --criteria "responses should be concise and use simple language"
+```
+
+### With your own prompts
+
+```bash
+python train.py \
+  --criteria "formal and professional tone" \
+  --prompts "Explain gravity" "What is DNA?" "How do computers work?"
+```
+
+### With prompts from a file
+
+```bash
+# prompts.txt — one prompt per line
+python train.py --criteria "detailed answers with examples" --prompts_file prompts.txt
+```
+
+### All options
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--criteria` | required | Plain-English description of what makes a good response |
+| `--prompts` | — | Prompts passed directly on the command line |
+| `--prompts_file` | — | Path to a `.txt` file with one prompt per line |
+| `--epochs` | 5 | Passes over the prompt dataset |
+| `--lr` | 2e-4 | Learning rate |
+| `--lora_r` | 8 | LoRA rank (higher = more expressive, more compute) |
+| `--completions` | 4 | Completions per prompt per epoch — more = better advantage estimates |
+| `--output_dir` | `./lora-adapter` | Where to save adapter weights, metrics, and plots |
+
+### After training — load the adapter
 
 ```python
-import torch
-import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import LoraConfig, get_peft_model, TaskType
+from peft import PeftModel
+import torch
 
-POLICY_MODEL_ID  = "meta-llama/Llama-3.2-1B"       # model being trained
-REWARD_MODEL_ID  = "OpenAssistant/reward-model-deberta-v3-large-v2"  # scorer
+base_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct", dtype=torch.float32)
+model      = PeftModel.from_pretrained(base_model, "./lora-adapter")
+model.eval()
 ```
 
 ---
 
-## Wrapping Your Reward Model
+## What the Outputs Mean
 
-All four methods below call a `reward_fn`. Define it once and pass it to whichever trainer you use.
+### Console output
 
-### Option A — Dedicated reward model (scalar output)
-
-```python
-from transformers import pipeline
-
-reward_pipe = pipeline(
-    "text-classification",
-    model=REWARD_MODEL_ID,
-    device=0,
-    truncation=True,
-    max_length=512,
-)
-
-def reward_fn(completions: list[str], **kwargs) -> list[float]:
-    results = reward_pipe(completions)
-    return [r["score"] for r in results]
+```
+Epoch 1/5 | Step 3 | Reward: 0.80 | Advantage: +1.23 | Loss: 0.51 | "Here is a concise answer..."
+Epoch 1/5 | Step 4 | Reward: 0.30 | Advantage: -1.41 | Loss: -0.62 | "The answer to this question..."
+  Group rewards: [0.8, 0.3, 0.6, 0.7] | mean=0.60 std=0.19
 ```
 
-### Option B — Another LLM as judge (GPT-4, Claude, etc.)
+- **Reward** — raw score from the judge (0.1–1.0)
+- **Advantage** — normalised signal; positive = above average, negative = below average
+- **Loss** — positive means reinforcing, negative means suppressing
+- **Group rewards** — all scores for this prompt in this step, plus the mean and std used for advantage
 
-```python
-import anthropic
+### Plot panels (`training_metrics.png`)
 
-client = anthropic.Anthropic()
-
-def reward_fn(completions: list[str], prompts: list[str] = None, **kwargs) -> list[float]:
-    scores = []
-    for prompt, completion in zip(prompts, completions):
-        response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=10,
-            system="Score the following response from 0.0 to 1.0. Reply with only a number.",
-            messages=[{"role": "user", "content": f"Prompt: {prompt}\nResponse: {completion}"}],
-        )
-        try:
-            scores.append(float(response.content[0].text.strip()))
-        except ValueError:
-            scores.append(0.0)
-    return scores
-```
-
-### Option C — Rule-based / programmatic reward
-
-```python
-def reward_fn(completions: list[str], **kwargs) -> list[float]:
-    scores = []
-    for text in completions:
-        score = 0.0
-        if len(text) > 50:            score += 0.3   # penalise short outputs
-        if "```" in text:             score += 0.4   # rewards code blocks
-        if text.count("\n") > 2:      score += 0.3   # rewards structured output
-        scores.append(score)
-    return scores
-```
+| Panel | What to look for |
+|-------|-----------------|
+| Reward per step | Should trend upward over training |
+| Advantage per step | Should have spread above and below zero — if it's always flat near zero, the judge isn't discriminating |
+| Loss per step | Will oscillate between positive and negative — this is normal |
+| Avg reward per epoch | Clearest signal — a rising trend means training is working |
+| Avg loss per epoch | Should stabilise, not necessarily decrease |
 
 ---
 
-## Method 1 — GRPO (Recommended)
-
-**Group Relative Policy Optimization.** Generates a group of completions per prompt, scores all of them, and trains the policy to increase the probability of above-average completions. No value head or reference model needed.
-
-### How it works
-
-```
-Prompt ──► generate N completions ──► score each ──► normalise within group
-                                                            │
-                                          advantage = (score - group_mean) / group_std
-                                                            │
-                                          policy loss = -log_prob * advantage  (+ KL term)
-```
-
-### Full example
-
-```python
-from trl import GRPOTrainer, GRPOConfig
-from datasets import load_dataset
-
-# 1. Load policy model with LoRA
-tokenizer = AutoTokenizer.from_pretrained(POLICY_MODEL_ID)
-tokenizer.pad_token = tokenizer.eos_token
-
-base_model = AutoModelForCausalLM.from_pretrained(POLICY_MODEL_ID, torch_dtype=torch.bfloat16)
-
-lora_config = LoraConfig(
-    r=16,
-    lora_alpha=32,
-    target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
-    lora_dropout=0.05,
-    task_type=TaskType.CAUSAL_LM,
-)
-policy_model = get_peft_model(base_model, lora_config)
-
-# 2. Dataset — must have a "prompt" column
-dataset = load_dataset("your-dataset")["train"]
-
-# 3. Define reward function (see options above)
-def reward_fn(completions, **kwargs):
-    return reward_pipe(completions)
-
-# 4. Configure GRPO
-config = GRPOConfig(
-    output_dir="./grpo-output",
-    num_generations=8,           # completions per prompt to compare
-    max_new_tokens=256,
-    temperature=0.9,             # generation temperature
-    learning_rate=1e-5,
-    per_device_train_batch_size=2,
-    gradient_accumulation_steps=8,
-    num_train_epochs=1,
-    kl_coef=0.01,                # KL penalty weight vs reference
-    bf16=True,
-    logging_steps=5,
-)
-
-# 5. Train
-trainer = GRPOTrainer(
-    model=policy_model,
-    reward_funcs=reward_fn,
-    args=config,
-    train_dataset=dataset,
-    processing_class=tokenizer,
-)
-trainer.train()
-
-# 6. Save LoRA adapter
-policy_model.save_pretrained("./grpo-lora-adapter")
-```
-
-### Key hyperparameters
-
-| Parameter | Effect | Recommended range |
-|-----------|--------|-------------------|
-| `num_generations` | More = better advantage estimates, more VRAM | 4–16 |
-| `kl_coef` | Higher = stay closer to base model | 0.001–0.1 |
-| `temperature` | Higher = more diverse group, noisier rewards | 0.7–1.0 |
-| `learning_rate` | Lower than SFT to avoid reward hacking | 1e-6–5e-5 |
-
----
-
-## Method 2 — PPO
-
-**Proximal Policy Optimization.** The standard RLHF algorithm. Trains a value head alongside the policy and clips updates to prevent large policy shifts.
-
-Use PPO when you need:
-- Explicit control over the value function
-- Per-token credit assignment
-- Fine-grained KL budget management
-
-### Full example
-
-```python
-from trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead
-from peft import get_peft_model, LoraConfig
-
-# 1. Build policy with value head
-base_model = AutoModelForCausalLM.from_pretrained(POLICY_MODEL_ID, torch_dtype=torch.bfloat16)
-lora_config = LoraConfig(r=16, lora_alpha=32, target_modules=["q_proj", "v_proj"], task_type=TaskType.CAUSAL_LM)
-peft_model = get_peft_model(base_model, lora_config)
-policy = AutoModelForCausalLMWithValueHead.from_pretrained(peft_model)
-
-# 2. PPO config
-ppo_config = PPOConfig(
-    learning_rate=1e-5,
-    batch_size=16,
-    mini_batch_size=4,
-    gradient_accumulation_steps=4,
-    kl_penalty="kl",             # or "abs", "mse", "full"
-    init_kl_coef=0.1,
-    target_kl=6.0,               # adaptive KL controller target
-    cliprange=0.2,
-    cliprange_value=0.2,
-)
-
-ppo_trainer = PPOTrainer(
-    config=ppo_config,
-    model=policy,
-    ref_model=None,              # None = frozen copy of initial policy
-    tokenizer=tokenizer,
-)
-
-# 3. Training loop
-for batch in ppo_trainer.dataloader:
-    queries = batch["input_ids"]
-
-    # Generate completions
-    response_tensors = ppo_trainer.generate(
-        queries,
-        max_new_tokens=256,
-        do_sample=True,
-        temperature=0.9,
-    )
-
-    # Decode and score
-    responses = tokenizer.batch_decode(response_tensors, skip_special_tokens=True)
-    rewards = reward_fn(responses)
-    reward_tensors = [torch.tensor(r, dtype=torch.float32) for r in rewards]
-
-    # PPO step
-    stats = ppo_trainer.step(queries, response_tensors, reward_tensors)
-    ppo_trainer.log_stats(stats, batch, reward_tensors)
-
-policy.save_pretrained("./ppo-lora-adapter")
-```
-
----
-
-## Method 3 — Reward-Weighted SFT
-
-No RL loop. Generate completions offline, score them, then fine-tune using supervised loss weighted by reward. Simpler to debug than GRPO/PPO.
-
-### How it works
-
-```
-Dataset prompts ──► generate completions ──► score ──► store (prompt, completion, reward)
-                                                              │
-                                      SFT loss weighted by normalised reward
-```
-
-### Full example
-
-```python
-from transformers import Trainer, TrainingArguments
-from torch.utils.data import Dataset
-
-# 1. Pre-generate scored completions
-def build_scored_dataset(prompts, policy_model, reward_fn, n_per_prompt=4):
-    records = []
-    for prompt in prompts:
-        inputs = tokenizer(prompt, return_tensors="pt").to(policy_model.device)
-        for _ in range(n_per_prompt):
-            with torch.no_grad():
-                out = policy_model.generate(**inputs, max_new_tokens=128, do_sample=True, temperature=0.9)
-            completion = tokenizer.decode(out[0], skip_special_tokens=True)
-            records.append({"prompt": prompt, "completion": completion})
-
-    completions = [r["completion"] for r in records]
-    scores = reward_fn(completions)
-    for r, s in zip(records, scores):
-        r["reward"] = s
-    return records
-
-# 2. Dataset wrapper
-class RewardDataset(Dataset):
-    def __init__(self, records, tokenizer, max_length=512):
-        self.records = records
-        self.tokenizer = tokenizer
-        self.max_length = max_length
-
-    def __len__(self):
-        return len(self.records)
-
-    def __getitem__(self, idx):
-        r = self.records[idx]
-        enc = self.tokenizer(
-            r["completion"], truncation=True, max_length=self.max_length,
-            padding="max_length", return_tensors="pt"
-        )
-        return {
-            "input_ids": enc["input_ids"].squeeze(),
-            "attention_mask": enc["attention_mask"].squeeze(),
-            "labels": enc["input_ids"].squeeze(),
-            "reward": torch.tensor(r["reward"], dtype=torch.float32),
-        }
-
-# 3. Custom loss
-def reward_weighted_loss(logits, labels, rewards):
-    shift_logits = logits[..., :-1, :].contiguous()
-    shift_labels = labels[..., 1:].contiguous()
-
-    per_token_loss = F.cross_entropy(
-        shift_logits.view(-1, shift_logits.size(-1)),
-        shift_labels.view(-1),
-        ignore_index=-100,
-        reduction="none",
-    ).view(shift_labels.shape)
-
-    mask = shift_labels != -100
-    per_sample_loss = (per_token_loss * mask).sum(-1) / mask.sum(-1).clamp(min=1)
-    weights = F.softmax(rewards, dim=0) * rewards.size(0)
-    return (weights * per_sample_loss).mean()
-
-# 4. Custom trainer
-class RewardWeightedTrainer(Trainer):
-    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
-        rewards = inputs.pop("reward")
-        outputs = model(**inputs)
-        loss = reward_weighted_loss(outputs.logits, inputs["labels"], rewards)
-        return (loss, outputs) if return_outputs else loss
-
-# 5. Train
-args = TrainingArguments(
-    output_dir="./rwsft-output",
-    num_train_epochs=2,
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=4,
-    learning_rate=2e-4,
-    bf16=True,
-)
-
-records = build_scored_dataset(prompts, policy_model, reward_fn)
-train_dataset = RewardDataset(records, tokenizer)
-
-trainer = RewardWeightedTrainer(model=policy_model, args=args, train_dataset=train_dataset)
-trainer.train()
-```
-
----
-
-## Method 4 — DPO (Preference Pairs)
-
-Use your reward model to label which of two completions is better, then train with Direct Preference Optimization. No generation loop during training — the preference dataset is built offline.
-
-### When to use
-
-- Your reward model is better at **ranking** than scoring (e.g. an LLM judge comparing two responses)
-- You want a stable, simple training loop with no RL
-
-### Building the preference dataset
-
-```python
-from datasets import Dataset
-
-def build_preference_dataset(prompts, policy_model, reward_fn):
-    rows = []
-    for prompt in prompts:
-        inputs = tokenizer(prompt, return_tensors="pt").to(policy_model.device)
-        with torch.no_grad():
-            out_a = policy_model.generate(**inputs, max_new_tokens=128, do_sample=True, temperature=0.9)
-            out_b = policy_model.generate(**inputs, max_new_tokens=128, do_sample=True, temperature=0.9)
-
-        completion_a = tokenizer.decode(out_a[0], skip_special_tokens=True)
-        completion_b = tokenizer.decode(out_b[0], skip_special_tokens=True)
-
-        score_a, score_b = reward_fn([completion_a, completion_b])
-
-        rows.append({
-            "prompt": prompt,
-            "chosen":   completion_a if score_a >= score_b else completion_b,
-            "rejected": completion_b if score_a >= score_b else completion_a,
-        })
-    return Dataset.from_list(rows)
-```
-
-### Training with DPO
-
-```python
-from trl import DPOTrainer, DPOConfig
-
-pref_dataset = build_preference_dataset(prompts, policy_model, reward_fn)
-
-dpo_config = DPOConfig(
-    output_dir="./dpo-output",
-    beta=0.1,               # KL regularisation; higher = stay closer to reference
-    loss_type="sigmoid",    # or "hinge", "ipo"
-    learning_rate=5e-5,
-    per_device_train_batch_size=2,
-    gradient_accumulation_steps=4,
-    num_train_epochs=1,
-    bf16=True,
-)
-
-trainer = DPOTrainer(
-    model=policy_model,
-    ref_model=None,         # with LoRA, None uses the frozen base as reference
-    args=dpo_config,
-    train_dataset=pref_dataset,
-    processing_class=tokenizer,
-)
-trainer.train()
-```
-
----
-
-## Choosing a Method
-
-```
-Does your reward model score a single completion?
-├── Yes
-│   ├── Want simplest setup?           → Reward-Weighted SFT
-│   ├── Want online RL, no value head? → GRPO  ✓ recommended
-│   └── Need value head / KL control?  → PPO
-└── No — can only compare two completions?
-    └── DPO
-```
-
-| Method | Online training | RL loop | Value head | Memory overhead | Stability |
-|--------|----------------|---------|------------|-----------------|-----------|
-| GRPO | Yes | Yes | No | Low | High |
-| PPO | Yes | Yes | Yes | Medium | Medium |
-| Reward-Weighted SFT | No | No | No | Lowest | Highest |
-| DPO | No | No | No | Lowest | Highest |
-
----
-
-## Hyperparameter Reference
-
-| Hyperparameter | GRPO | PPO | RW-SFT | DPO |
-|----------------|------|-----|--------|-----|
-| Learning rate | 1e-6 – 5e-5 | 1e-6 – 1e-5 | 1e-5 – 2e-4 | 1e-6 – 5e-5 |
-| KL coefficient | 0.001 – 0.1 | 0.01 – 0.2 | — | beta: 0.01 – 0.5 |
-| Batch size | 2–8 | 4–32 | 4–16 | 2–8 |
-| Generations per prompt | 4–16 | — | 2–8 | 2 |
-| LoRA rank | 16–64 | 16–64 | 16–32 | 16–32 |
+## Hyperparameter Guide
+
+| Situation | Recommendation |
+|-----------|---------------|
+| Advantage always near zero | Increase `--completions` to 8+ so the group has more variance |
+| Reward not improving after 3+ epochs | Try a more specific `--criteria`, or more diverse prompts |
+| Training very slow on CPU | Reduce `--completions` to 2, reduce `--epochs`, shorten `max_new_tokens` in `generate_completion()` |
+| Want stronger adaptation | Increase `--lora_r` to 16 or 32 |
+| Reward improving then collapsing | Lower `--lr` to 5e-5 |
 
 ---
 
 ## Common Failure Modes
 
-| Symptom | Likely cause | Fix |
-|---------|-------------|-----|
-| Reward increases then collapses | Reward hacking / mode collapse | Increase KL coefficient |
-| Loss NaN early in training | LR too high | Reduce LR by 5–10x, add warmup steps |
-| Reward stays flat | Reward model too strict / sparse signal | Use a softer reward or increase `num_generations` |
-| Generated text becomes repetitive | KL too low, policy drifts far from base | Increase `kl_coef` |
-| VRAM OOM during generation | `num_generations` too high | Reduce generations or use QLoRA |
-| DPO loss goes negative | `beta` too low | Increase `beta` to 0.3–0.5 |
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Advantage always 0.0 | All completions scored identically | Judge model too small, or criteria too vague — use a clearer criteria |
+| Reward flat across all epochs | Too few steps | More prompts, more completions, more epochs |
+| Loss NaN | LR too high | Reduce `--lr` by 10× |
+| Reward improves then crashes | Reward hacking / over-optimisation | Lower `--lr`, reduce epochs |
+| Judge always returns 0.5 | Score parsing failed | Check terminal for `[Warning]` lines — the judge may not be following instructions |
+
+---
+
+## Other Methods
+
+`train.py` implements Advantage-Weighted SFT, which is the most stable option for CPU. Other methods exist for GPU environments:
+
+| Method | When to use | Library |
+|--------|-------------|---------|
+| **GRPO** | Online RL, no value head needed | `trl.GRPOTrainer` |
+| **PPO** | Full RL with explicit value function | `trl.PPOTrainer` |
+| **DPO** | Reward model ranks pairs, not scalar scores | `trl.DPOTrainer` |
+| **Advantage-Weighted SFT** | CPU, simplest, most stable | `train.py` (this repo) |
