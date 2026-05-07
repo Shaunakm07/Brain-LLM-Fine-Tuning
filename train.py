@@ -20,29 +20,38 @@ The script then runs a training loop where:
 
 Over time, the policy model learns to produce outputs that the judge scores highly.
 
-HOW THE OPTIMISATION WORKS (Advantage-Weighted SFT)
-----------------------------------------------------
-The previous version used raw reward scaling:
-    loss = cross_entropy × reward
+HOW THE OPTIMISATION WORKS (Advantage-Weighted SFT + KL Penalty)
+-----------------------------------------------------------------
+The loss has two components:
 
-The problem: if the judge gives all completions a similar score (e.g. all 0.7),
-the gradient is the same for every completion and the model doesn't learn which
-responses were better or worse than the others.
+    loss = (cross_entropy × advantage) + kl_coef × KL(policy || base)
 
-The fix is advantage normalisation, borrowed from GRPO/PPO:
+COMPONENT 1 — Advantage-weighted cross-entropy
+    advantage = (reward - mean(rewards)) / std(rewards)
 
-    advantage = (reward - mean(rewards)) / (std(rewards) + ε)
-    loss      = cross_entropy × advantage
+    This centres the signal around zero for each prompt:
+      - Above-average completions → positive advantage → reinforced
+      - Below-average completions → negative advantage → suppressed
+      - Average completions → near-zero gradient → ignored
 
-This centres the signal around zero for each prompt:
-  - Above-average completions → positive advantage → loss is positive → model
-    is reinforced to produce this completion more often
-  - Below-average completions → negative advantage → loss is negative → when
-    minimised, this INCREASES cross-entropy for that completion, suppressing it
+COMPONENT 2 — KL penalty
+    KL(policy || base) measures how far the policy has drifted from the
+    frozen base model. It is added to the loss to penalise drift.
 
-This works even when the judge gives coarse scores (e.g. only 0.3 / 0.5 / 0.7),
-because what matters is the *relative* difference within the group, not the
-absolute values.
+    WHY IS THIS NEEDED?
+    Without the KL term, two problems emerge over time:
+      1. Suppression gradients push the model away from outputs it was
+         confident about, making it uncertain across the board → CE rises
+      2. The policy drifts so far from the base that it starts generating
+         incoherent outputs to satisfy the reward signal (reward hacking)
+
+    The KL penalty keeps the policy "anchored" near the base model while
+    still allowing it to improve on the reward signal. This is the same
+    mechanism used in PPO and RLHF.
+
+    kl_coef controls the trade-off:
+      - Too low  → policy drifts, loss increases, potential reward hacking
+      - Too high → policy can't move far enough to improve reward
 
 WHY A SEPARATE, LARGER REWARD MODEL?
 -------------------------------------
@@ -123,12 +132,36 @@ REWARD_MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 if torch.cuda.is_available():
     DEVICE = "cuda"
     DTYPE  = torch.float16
-elif torch.backends.mps.is_available():
-    DEVICE = "mps"
-    DTYPE  = torch.float32
 else:
     DEVICE = "cpu"
     DTYPE  = torch.float32
+
+
+# ---------------------------------------------------------------------------
+# Reference model — frozen copy of the base policy used for KL penalty
+# ---------------------------------------------------------------------------
+
+def load_reference_model(model_id: str = POLICY_MODEL_ID):
+    """
+    Load a frozen copy of the base policy model.
+
+    This is used to compute the KL penalty: KL(policy || reference).
+
+    The reference model is identical to the policy model at the start of
+    training and never changes. It acts as an anchor — the KL penalty
+    prevents the policy from drifting too far from the base distribution,
+    which would cause loss to increase and risk reward hacking.
+
+    It must be a separate instance from the policy model so that training
+    the policy does not affect it.
+    """
+    print(f"Loading reference model: {model_id} (frozen anchor)...")
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model     = AutoModelForCausalLM.from_pretrained(model_id, dtype=DTYPE).to(DEVICE)
+    model.eval()
+    for p in model.parameters():
+        p.requires_grad = False
+    return model, tokenizer
 
 
 # ---------------------------------------------------------------------------
@@ -308,69 +341,66 @@ class PromptDataset(Dataset):
 
 def advantage_weighted_loss(
     model,
+    ref_model,
     tokenizer,
     prompt: str,
     completion: str,
     advantage: float,
-) -> torch.Tensor:
+    kl_coef: float = 0.1,
+) -> tuple[torch.Tensor, float]:
     """
-    Compute advantage-weighted cross-entropy loss for a single completion.
+    Compute advantage-weighted cross-entropy loss with a KL penalty.
 
-    INTUITION
-    ---------
-    Cross-entropy loss measures how surprised the model is by each token
-    in the completion. Minimising it makes the model more likely to produce
-    this completion in future.
+    TOTAL LOSS
+    ----------
+        loss = (cross_entropy × advantage) + kl_coef × KL(policy || reference)
 
-    We scale by advantage rather than raw reward:
+    COMPONENT 1 — Advantage-weighted cross-entropy
+        Cross-entropy measures how surprised the model is by each token.
+        Scaling by advantage means:
+          - advantage > 0 → reinforce this completion (loss positive, minimise → more likely)
+          - advantage < 0 → suppress this completion (loss negative, minimise → less likely)
+          - advantage ≈ 0 → no gradient signal
 
-        loss = cross_entropy(completion | prompt) × advantage
+    COMPONENT 2 — KL penalty
+        KL(policy || reference) measures token-level divergence between the
+        current policy and the frozen base model. Adding this to the loss
+        penalises the policy for drifting away from the base distribution.
 
-    Where advantage = (reward - mean_reward) / std_reward for this prompt's
-    group of completions.
-
-    This means:
-      - advantage > 0  (above-average completion):
-          loss is positive → minimising it reinforces this completion ✓
-
-      - advantage < 0  (below-average completion):
-          loss is negative → minimising it (making it more negative) INCREASES
-          cross-entropy for this completion, suppressing it ✓
-
-      - advantage ≈ 0  (average completion):
-          near-zero gradient → model ignores this completion ✓
+        WHY THIS FIXES RISING LOSS
+        Without the KL term, suppression gradients accumulate over training —
+        the model is pushed away from many outputs without being anchored.
+        This makes cross-entropy rise on everything it generates.
+        The KL penalty keeps the policy distribution close to the base,
+        bounding how much CE can grow.
 
     WHY WE INCLUDE THE PROMPT IN THE INPUT
-    ---------------------------------------
-    The model generated this completion conditioned on the full chat-formatted
-    prompt. If we compute loss on the completion tokens alone (no context), the
-    gradient teaches the model to reproduce the completion from a blank slate —
-    a completely different task to what it was actually doing.
-
-    Fix: tokenize prompt + completion together as a full conversation, then mask
-    out the prompt tokens in the labels (set to -100 so they contribute zero
-    loss). This way the gradient only flows through the completion tokens, but
-    the model has the correct context to condition on.
+        The model generates completions conditioned on the full prompt. If we
+        compute loss on the completion tokens alone (no context), the gradient
+        teaches the model to reproduce the completion from a blank slate.
+        We tokenize prompt + completion together and mask the prompt tokens
+        with -100 so they contribute zero loss, but still provide context.
 
     Args:
         model:      Policy model in training mode
-        tokenizer:  Corresponding tokenizer
-        prompt:     The original user prompt (needed for context)
+        ref_model:  Frozen reference model (base policy, never updated)
+        tokenizer:  Tokenizer for both models
+        prompt:     The original user prompt
         completion: The generated response string
         advantage:  Normalised advantage scalar (can be negative)
+        kl_coef:    Weight of the KL penalty (default 0.1)
 
     Returns:
-        Scalar loss tensor (may be negative for below-average completions)
+        (total_loss tensor, kl_value float) — kl_value logged separately for monitoring
     """
-    # Build the full conversation: system + user prompt + assistant completion
+    # Build full conversation and prompt-only text for masking
     messages = [
         {"role": "system",    "content": "You are a helpful assistant."},
         {"role": "user",      "content": prompt},
         {"role": "assistant", "content": completion},
     ]
-    full_text   = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+    full_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
 
-    # Also build just the prompt portion so we know how many tokens to mask
     prompt_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user",   "content": prompt},
@@ -380,20 +410,30 @@ def advantage_weighted_loss(
     full_enc   = tokenizer(full_text,   return_tensors="pt", truncation=True, max_length=512).to(DEVICE)
     prompt_enc = tokenizer(prompt_text, return_tensors="pt").to(DEVICE)
 
-    # Clamp prompt_len to the truncated full_enc length.
-    # Without this, if full_text exceeds 512 tokens after truncation, prompt_len
-    # could be larger than the tensor — masking all tokens and producing NaN loss.
+    # Clamp to avoid masking beyond the truncated length
     prompt_len = min(prompt_enc["input_ids"].shape[-1], full_enc["input_ids"].shape[-1])
 
-    # Labels: -100 for all prompt tokens (ignored in loss), real token ids for completion
     labels = full_enc["input_ids"].clone()
     labels[0, :prompt_len] = -100
 
-    outputs   = model(**full_enc, labels=labels)
-    base_loss = outputs.loss  # mean CE over completion tokens only (always positive)
+    # Policy forward pass
+    policy_outputs = model(**full_enc, labels=labels)
+    ce_loss        = policy_outputs.loss  # mean CE over completion tokens
 
-    advantage_t = torch.tensor(advantage, dtype=base_loss.dtype, device=DEVICE)
-    return base_loss * advantage_t
+    # KL penalty: KL(policy || reference) over all token positions
+    with torch.no_grad():
+        ref_outputs = ref_model(**full_enc)
+
+    policy_logprobs = F.log_softmax(policy_outputs.logits, dim=-1)
+    ref_probs       = F.softmax(ref_outputs.logits,        dim=-1)
+
+    # Mean KL divergence across all token positions
+    kl = F.kl_div(policy_logprobs, ref_probs, reduction="batchmean")
+
+    advantage_t = torch.tensor(advantage, dtype=ce_loss.dtype, device=DEVICE)
+    total_loss  = ce_loss * advantage_t + kl_coef * kl
+
+    return total_loss, kl.item()
 
 
 # ---------------------------------------------------------------------------
@@ -438,6 +478,7 @@ def train(
     """
     policy_model, policy_tokenizer = load_policy_model(lora_r=lora_r)
     reward_model, reward_tokenizer = load_reward_model()
+    ref_model,    _                = load_reference_model()
 
     optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, policy_model.parameters()),
@@ -450,6 +491,7 @@ def train(
     step_losses     = []
     step_rewards    = []
     step_advantages = []
+    step_kls        = []   # KL divergence per step — should stay low and stable
     epoch_abs_losses = []  # avg |loss| per epoch — meaningful signal unlike avg loss
     epoch_rewards   = []
 
@@ -508,6 +550,7 @@ def train(
                     step_rewards.append(r)
                     step_losses.append(0.0)
                     step_advantages.append(0.0)
+                    step_kls.append(0.0)
                 continue
 
             # ----------------------------------------------------------------
@@ -515,7 +558,9 @@ def train(
             # ----------------------------------------------------------------
             for completion, reward, advantage in zip(completions, rewards, advantages):
                 optimizer.zero_grad()
-                loss = advantage_weighted_loss(policy_model, policy_tokenizer, prompt, completion, advantage)
+                loss, kl_val = advantage_weighted_loss(
+                    policy_model, ref_model, policy_tokenizer, prompt, completion, advantage
+                )
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(policy_model.parameters(), 1.0)
                 optimizer.step()
@@ -524,6 +569,7 @@ def train(
                 step_losses.append(loss_val)
                 step_rewards.append(reward)
                 step_advantages.append(advantage)
+                step_kls.append(kl_val)
                 epoch_abs_loss_sum += abs(loss_val)  # track magnitude, not sign
                 epoch_reward_sum   += reward
                 count            += 1
@@ -532,7 +578,7 @@ def train(
                 print(
                     f"Epoch {epoch+1}/{epochs} | Step {global_step} | "
                     f"Reward: {reward:.2f} | Advantage: {advantage:+.3f} | "
-                    f"Loss: {loss_val:.4f} | "
+                    f"Loss: {loss_val:.4f} | KL: {kl_val:.4f} | "
                     f'"{completion[:55].strip()}..."'
                 )
 
@@ -553,6 +599,7 @@ def train(
         "step_losses":      step_losses,
         "step_rewards":     step_rewards,
         "step_advantages":  step_advantages,
+        "step_kls":         step_kls,
         "epoch_abs_losses": epoch_abs_losses,
         "epoch_rewards":    epoch_rewards,
     }
@@ -561,7 +608,7 @@ def train(
         json.dump(metrics, f, indent=2)
     print(f"Metrics saved to {metrics_path}")
 
-    plot_metrics(step_losses, step_rewards, step_advantages, epoch_abs_losses, epoch_rewards, output_dir)
+    plot_metrics(step_losses, step_rewards, step_advantages, step_kls, epoch_abs_losses, epoch_rewards, output_dir)
     return policy_model, policy_tokenizer
 
 
@@ -573,19 +620,21 @@ def plot_metrics(
     step_losses:      list,
     step_rewards:     list,
     step_advantages:  list,
+    step_kls:         list,
     epoch_abs_losses: list,
     epoch_rewards:    list,
     output_dir:       str,
 ):
     """
-    Save a 5-panel training summary plot.
+    Save a 6-panel training summary plot.
 
     Panels:
       Top-left     : Reward per step + rolling average — primary signal of improvement
       Top-middle   : Advantage per step — should spread above and below zero
       Top-right    : Loss per step — oscillates (negative = suppression steps, normal)
       Bottom-left  : Avg reward per epoch — clearest epoch-level signal
-      Bottom-right : Avg |loss| per epoch — shows gradient update magnitude
+      Bottom-middle: Avg |loss| per epoch — shows gradient update magnitude
+      Bottom-right : KL divergence per step — should stay low and stable (not growing)
 
     WHY AVG |LOSS| INSTEAD OF AVG LOSS
     ------------------------------------
@@ -593,10 +642,18 @@ def plot_metrics(
     trends toward zero regardless of training quality. Avg absolute loss shows how
     strongly the model is being updated each epoch, which is actually informative.
 
+    READING THE KL PANEL
+    ---------------------
+    KL divergence measures how far the policy has drifted from the frozen base model.
+    A healthy KL stays low and roughly stable. A rising KL means the policy is drifting
+    — if it coincides with rising loss, the KL penalty coefficient (kl_coef) may need
+    to be increased.
+
     What to look for:
       - Reward (top-left + bottom-left) trending upward = training is working
       - Advantage (top-middle) spread above and below zero = judge discriminating
-      - Avg |loss| (bottom-right) stable and non-zero = gradients are flowing
+      - Avg |loss| (bottom-middle) stable and non-zero = gradients are flowing
+      - KL (bottom-right) low and stable = policy staying anchored to base
       - If reward is flat: criteria may be too easy or judge not discriminating
     """
     def rolling_avg(values, window=10):
@@ -652,8 +709,12 @@ def plot_metrics(
     axes[1, 1].set_ylabel("Avg |Loss|")
     axes[1, 1].grid(True, alpha=0.3)
 
-    # Hide the unused 6th panel
-    axes[1, 2].axis("off")
+    # KL divergence per step — should stay low; rising KL = policy drifting from base
+    axes[1, 2].plot(step_kls, color="green", linewidth=0.8)
+    axes[1, 2].set_title("KL Divergence per Step  (low = anchored)")
+    axes[1, 2].set_xlabel("Step")
+    axes[1, 2].set_ylabel("KL(policy || base)")
+    axes[1, 2].grid(True, alpha=0.3)
 
     plt.tight_layout()
     plot_path = os.path.join(output_dir, "training_metrics.png")
