@@ -14,6 +14,10 @@ A guide to fine-tuning small LLMs using LoRA (Low-Rank Adaptation) with intercha
 6. [Usage Examples](#usage-examples)
 7. [Choosing an Optimizer](#choosing-an-optimizer)
 
+### Further Reading
+
+- [Reward Maximisation — fine-tuning to maximise another model's output](docs/reward-maximization.md)
+
 ---
 
 ## Overview
