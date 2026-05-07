@@ -447,11 +447,11 @@ def train(
     dataset    = PromptDataset(prompts)
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
 
-    step_losses    = []
-    step_rewards   = []
-    step_advantages= []
-    epoch_losses   = []
-    epoch_rewards  = []
+    step_losses     = []
+    step_rewards    = []
+    step_advantages = []
+    epoch_abs_losses = []  # avg |loss| per epoch — meaningful signal unlike avg loss
+    epoch_rewards   = []
 
     print(f"\nCriteria  : {criteria}")
     print(f"Device    : {DEVICE}")
@@ -464,9 +464,9 @@ def train(
 
     for epoch in range(epochs):
         policy_model.train()
-        epoch_loss_sum   = 0.0
-        epoch_reward_sum = 0.0
-        count            = 0
+        epoch_abs_loss_sum = 0.0   # sum of |loss| — always positive, meaningful average
+        epoch_reward_sum   = 0.0
+        count              = 0
 
         for batch in dataloader:
             prompt = batch[0]
@@ -524,8 +524,8 @@ def train(
                 step_losses.append(loss_val)
                 step_rewards.append(reward)
                 step_advantages.append(advantage)
-                epoch_loss_sum   += loss_val
-                epoch_reward_sum += reward
+                epoch_abs_loss_sum += abs(loss_val)  # track magnitude, not sign
+                epoch_reward_sum   += reward
                 count            += 1
                 global_step      += 1
 
@@ -538,11 +538,11 @@ def train(
 
             print(f"  Group rewards: {[round(r,2) for r in rewards]} | mean={mean_r:.2f} std={std_r:.2f}\n")
 
-        avg_loss   = epoch_loss_sum   / max(count, 1)
-        avg_reward = epoch_reward_sum / max(count, 1)
-        epoch_losses.append(avg_loss)
+        avg_abs_loss = epoch_abs_loss_sum / max(count, 1)
+        avg_reward   = epoch_reward_sum   / max(count, 1)
+        epoch_abs_losses.append(avg_abs_loss)
         epoch_rewards.append(avg_reward)
-        print(f"--- Epoch {epoch+1} | Avg loss: {avg_loss:.4f} | Avg reward: {avg_reward:.2f} ---\n")
+        print(f"--- Epoch {epoch+1} | Avg |loss|: {avg_abs_loss:.4f} | Avg reward: {avg_reward:.2f} ---\n")
 
     os.makedirs(output_dir, exist_ok=True)
     policy_model.save_pretrained(output_dir)
@@ -550,18 +550,18 @@ def train(
     print(f"LoRA adapter saved to {output_dir}/")
 
     metrics = {
-        "step_losses":     step_losses,
-        "step_rewards":    step_rewards,
-        "step_advantages": step_advantages,
-        "epoch_losses":    epoch_losses,
-        "epoch_rewards":   epoch_rewards,
+        "step_losses":      step_losses,
+        "step_rewards":     step_rewards,
+        "step_advantages":  step_advantages,
+        "epoch_abs_losses": epoch_abs_losses,
+        "epoch_rewards":    epoch_rewards,
     }
     metrics_path = os.path.join(output_dir, "metrics.json")
     with open(metrics_path, "w") as f:
         json.dump(metrics, f, indent=2)
     print(f"Metrics saved to {metrics_path}")
 
-    plot_metrics(step_losses, step_rewards, step_advantages, epoch_losses, epoch_rewards, output_dir)
+    plot_metrics(step_losses, step_rewards, step_advantages, epoch_abs_losses, epoch_rewards, output_dir)
     return policy_model, policy_tokenizer
 
 
@@ -570,39 +570,58 @@ def train(
 # ---------------------------------------------------------------------------
 
 def plot_metrics(
-    step_losses:     list,
-    step_rewards:    list,
-    step_advantages: list,
-    epoch_losses:    list,
-    epoch_rewards:   list,
-    output_dir:      str,
+    step_losses:      list,
+    step_rewards:     list,
+    step_advantages:  list,
+    epoch_abs_losses: list,
+    epoch_rewards:    list,
+    output_dir:       str,
 ):
     """
     Save a 5-panel training summary plot.
 
     Panels:
-      Top-left     : Reward per step — should trend upward
-      Top-middle   : Advantage per step — should have spread (not all near zero)
-      Top-right    : Loss per step — will oscillate (negative = suppression steps)
-      Bottom-left  : Avg reward per epoch — clearest signal of whether training works
-      Bottom-right : Avg loss per epoch
+      Top-left     : Reward per step + rolling average — primary signal of improvement
+      Top-middle   : Advantage per step — should spread above and below zero
+      Top-right    : Loss per step — oscillates (negative = suppression steps, normal)
+      Bottom-left  : Avg reward per epoch — clearest epoch-level signal
+      Bottom-right : Avg |loss| per epoch — shows gradient update magnitude
+
+    WHY AVG |LOSS| INSTEAD OF AVG LOSS
+    ------------------------------------
+    With advantage-weighted loss, positives and negatives cancel — avg loss always
+    trends toward zero regardless of training quality. Avg absolute loss shows how
+    strongly the model is being updated each epoch, which is actually informative.
 
     What to look for:
-      - Reward trending upward = working
-      - Advantage has variance (spread above and below zero) = judge is discriminating
-      - If advantage is always near zero = judge gives same score to all completions
-        → try more completions per prompt or a clearer criteria
+      - Reward (top-left + bottom-left) trending upward = training is working
+      - Advantage (top-middle) spread above and below zero = judge discriminating
+      - Avg |loss| (bottom-right) stable and non-zero = gradients are flowing
+      - If reward is flat: criteria may be too easy or judge not discriminating
     """
+    def rolling_avg(values, window=10):
+        """Compute a simple rolling average for smoothing noisy step plots."""
+        if len(values) < window:
+            return values
+        return [
+            sum(values[max(0, i - window):i + 1]) / len(values[max(0, i - window):i + 1])
+            for i in range(len(values))
+        ]
+
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     fig.suptitle("Training Metrics", fontsize=14, fontweight="bold")
 
-    axes[0, 0].plot(step_rewards, color="darkorange", linewidth=1)
+    # Reward per step + rolling average
+    axes[0, 0].plot(step_rewards, color="darkorange", linewidth=0.8, alpha=0.4, label="Raw")
+    axes[0, 0].plot(rolling_avg(step_rewards), color="darkorange", linewidth=2, label="Rolling avg")
     axes[0, 0].set_title("Reward per Step")
     axes[0, 0].set_xlabel("Step")
     axes[0, 0].set_ylabel("Reward (0–1)")
     axes[0, 0].set_ylim(0, 1)
+    axes[0, 0].legend(fontsize=8)
     axes[0, 0].grid(True, alpha=0.3)
 
+    # Advantage per step
     axes[0, 1].plot(step_advantages, color="purple", linewidth=1)
     axes[0, 1].axhline(0, color="black", linewidth=0.8, linestyle="--")
     axes[0, 1].set_title("Advantage per Step")
@@ -610,24 +629,27 @@ def plot_metrics(
     axes[0, 1].set_ylabel("Advantage")
     axes[0, 1].grid(True, alpha=0.3)
 
-    axes[0, 2].plot(step_losses, color="steelblue", linewidth=1)
+    # Loss per step (oscillates between positive/negative — this is expected)
+    axes[0, 2].plot(step_losses, color="steelblue", linewidth=0.8)
     axes[0, 2].axhline(0, color="black", linewidth=0.8, linestyle="--")
-    axes[0, 2].set_title("Loss per Step")
+    axes[0, 2].set_title("Loss per Step (± = reinforce/suppress)")
     axes[0, 2].set_xlabel("Step")
-    axes[0, 2].set_ylabel("Loss (negative = suppression)")
+    axes[0, 2].set_ylabel("Loss")
     axes[0, 2].grid(True, alpha=0.3)
 
+    # Avg reward per epoch — the key metric
     axes[1, 0].plot(range(1, len(epoch_rewards) + 1), epoch_rewards, marker="o", color="darkorange")
-    axes[1, 0].set_title("Avg Reward per Epoch")
+    axes[1, 0].set_title("Avg Reward per Epoch  ← key metric")
     axes[1, 0].set_xlabel("Epoch")
     axes[1, 0].set_ylabel("Avg Reward (0–1)")
     axes[1, 0].set_ylim(0, 1)
     axes[1, 0].grid(True, alpha=0.3)
 
-    axes[1, 1].plot(range(1, len(epoch_losses) + 1), epoch_losses, marker="o", color="steelblue")
-    axes[1, 1].set_title("Avg Loss per Epoch")
+    # Avg |loss| per epoch — shows gradient magnitude, not direction
+    axes[1, 1].plot(range(1, len(epoch_abs_losses) + 1), epoch_abs_losses, marker="o", color="steelblue")
+    axes[1, 1].set_title("Avg |Loss| per Epoch  (update magnitude)")
     axes[1, 1].set_xlabel("Epoch")
-    axes[1, 1].set_ylabel("Avg Loss")
+    axes[1, 1].set_ylabel("Avg |Loss|")
     axes[1, 1].grid(True, alpha=0.3)
 
     # Hide the unused 6th panel
