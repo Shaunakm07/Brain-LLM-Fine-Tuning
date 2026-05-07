@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ML / training artifacts
+runs/
+logs/
+wandb/
+mlruns/
+checkpoints/
+*.ckpt
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+
+# Hugging Face / model caches
+.cache/
+~/.cache/huggingface/
+
+# Large datasets
+data/
+datasets/
+*.csv
+*.parquet
+*.jsonl
+*.json.gz
+*.hdf5
+*.h5
+*.npy
+*.npz
+*.pkl
+*.pickle
+
+# Output / generated files
+output/
+outputs/
+results/
+generated/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Secrets / API keys
+*.pem
+*.key
+secrets/
