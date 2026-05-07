@@ -1,22 +1,25 @@
 """
 Simple local inference script for Apple Silicon (M2 Pro).
-Model: Qwen2.5-0.5B-Instruct — runs fully on MPS (Metal).
+Model: Qwen2.5-0.5B-Instruct
 """
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-DEVICE   = "mps" if torch.backends.mps.is_available() else "cpu"
+
+if torch.cuda.is_available():
+    DEVICE = "cuda"
+    DTYPE  = torch.float16
+else:
+    DEVICE = "cpu"
+    DTYPE  = torch.float32
+
 
 def load_model(model_id: str = MODEL_ID):
-    print(f"Loading {model_id} on {DEVICE}...")
+    print(f"Loading {model_id}...")
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=torch.float16,
-        device_map=DEVICE,
-    )
+    model = AutoModelForCausalLM.from_pretrained(model_id, dtype=DTYPE).to(DEVICE)
     model.eval()
     print("Model ready.\n")
     return model, tokenizer
@@ -46,7 +49,6 @@ def generate(
             pad_token_id=tokenizer.eos_token_id,
         )
 
-    # Decode only the newly generated tokens
     new_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
     return tokenizer.decode(new_tokens, skip_special_tokens=True)
 
