@@ -91,6 +91,13 @@ USAGE
 """
 
 import os
+
+# Must be set before importing torch.
+# MPS (Apple Silicon GPU) doesn't support every PyTorch op. This flag tells
+# PyTorch to silently fall back to CPU for any unsupported op rather than
+# crashing. The vast majority of the work still runs on the GPU.
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+
 import json
 import argparse
 import torch
@@ -110,8 +117,18 @@ from peft import LoraConfig, get_peft_model, TaskType
 POLICY_MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
 REWARD_MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-DTYPE  = torch.float16 if DEVICE == "cuda" else torch.float32
+# Device priority: CUDA (NVIDIA) → MPS (Apple Silicon) → CPU
+# MPS uses float32 — float16 triggers a Metal shader compiler bug on this model.
+# CUDA uses float16 to halve memory usage with no quality loss.
+if torch.cuda.is_available():
+    DEVICE = "cuda"
+    DTYPE  = torch.float16
+elif torch.backends.mps.is_available():
+    DEVICE = "mps"
+    DTYPE  = torch.float32
+else:
+    DEVICE = "cpu"
+    DTYPE  = torch.float32
 
 
 # ---------------------------------------------------------------------------
@@ -260,7 +277,7 @@ def generate_completion(model, tokenizer, prompt: str, max_new_tokens: int = 128
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=True,
-            temperature=0.9,
+            temperature=1.2,  # higher temperature = more diverse completions across the group
             pad_token_id=tokenizer.eos_token_id,
         )
 
@@ -292,6 +309,7 @@ class PromptDataset(Dataset):
 def advantage_weighted_loss(
     model,
     tokenizer,
+    prompt: str,
     completion: str,
     advantage: float,
 ) -> torch.Tensor:
@@ -306,7 +324,7 @@ def advantage_weighted_loss(
 
     We scale by advantage rather than raw reward:
 
-        loss = cross_entropy(completion) × advantage
+        loss = cross_entropy(completion | prompt) × advantage
 
     Where advantage = (reward - mean_reward) / std_reward for this prompt's
     group of completions.
@@ -322,23 +340,57 @@ def advantage_weighted_loss(
       - advantage ≈ 0  (average completion):
           near-zero gradient → model ignores this completion ✓
 
-    This is far more informative than raw reward scaling, where all completions
-    receiving a similar reward would produce identical gradient magnitudes.
+    WHY WE INCLUDE THE PROMPT IN THE INPUT
+    ---------------------------------------
+    The model generated this completion conditioned on the full chat-formatted
+    prompt. If we compute loss on the completion tokens alone (no context), the
+    gradient teaches the model to reproduce the completion from a blank slate —
+    a completely different task to what it was actually doing.
+
+    Fix: tokenize prompt + completion together as a full conversation, then mask
+    out the prompt tokens in the labels (set to -100 so they contribute zero
+    loss). This way the gradient only flows through the completion tokens, but
+    the model has the correct context to condition on.
 
     Args:
         model:      Policy model in training mode
         tokenizer:  Corresponding tokenizer
+        prompt:     The original user prompt (needed for context)
         completion: The generated response string
         advantage:  Normalised advantage scalar (can be negative)
 
     Returns:
         Scalar loss tensor (may be negative for below-average completions)
     """
-    enc    = tokenizer(completion, return_tensors="pt", truncation=True, max_length=512).to(DEVICE)
-    labels = enc["input_ids"].clone()
+    # Build the full conversation: system + user prompt + assistant completion
+    messages = [
+        {"role": "system",    "content": "You are a helpful assistant."},
+        {"role": "user",      "content": prompt},
+        {"role": "assistant", "content": completion},
+    ]
+    full_text   = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
 
-    outputs   = model(**enc, labels=labels)
-    base_loss = outputs.loss  # mean cross-entropy over all tokens (always positive)
+    # Also build just the prompt portion so we know how many tokens to mask
+    prompt_messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user",   "content": prompt},
+    ]
+    prompt_text = tokenizer.apply_chat_template(prompt_messages, tokenize=False, add_generation_prompt=True)
+
+    full_enc   = tokenizer(full_text,   return_tensors="pt", truncation=True, max_length=512).to(DEVICE)
+    prompt_enc = tokenizer(prompt_text, return_tensors="pt").to(DEVICE)
+
+    # Clamp prompt_len to the truncated full_enc length.
+    # Without this, if full_text exceeds 512 tokens after truncation, prompt_len
+    # could be larger than the tensor — masking all tokens and producing NaN loss.
+    prompt_len = min(prompt_enc["input_ids"].shape[-1], full_enc["input_ids"].shape[-1])
+
+    # Labels: -100 for all prompt tokens (ignored in loss), real token ids for completion
+    labels = full_enc["input_ids"].clone()
+    labels[0, :prompt_len] = -100
+
+    outputs   = model(**full_enc, labels=labels)
+    base_loss = outputs.loss  # mean CE over completion tokens only (always positive)
 
     advantage_t = torch.tensor(advantage, dtype=base_loss.dtype, device=DEVICE)
     return base_loss * advantage_t
@@ -436,19 +488,34 @@ def train(
                 for c in completions
             ]
 
-            # Compute advantage: normalise rewards to mean=0, std=1
-            # Add epsilon to std to avoid division by zero when all rewards are identical
+            # Compute advantage: normalise rewards to mean=0, std=1.
+            # Use a minimum std of 0.1 to prevent explosion when scores cluster
+            # closely — this keeps advantages in a reasonable range without
+            # skipping updates entirely.
+            # Clamp final advantages to [-2, 2] as an additional safety rail.
             mean_r = sum(rewards) / len(rewards)
             std_r  = (sum((r - mean_r) ** 2 for r in rewards) / len(rewards)) ** 0.5
-            std_r  = max(std_r, 1e-8)
-            advantages = [(r - mean_r) / std_r for r in rewards]
+            std_r  = max(std_r, 0.1)
+
+            advantages = [max(-2.0, min(2.0, (r - mean_r) / std_r)) for r in rewards]
+
+            if all(a == 0.0 for a in advantages):
+                print(f"  [Skip] All advantages are zero — rewards: {[round(r,2) for r in rewards]}")
+                global_step += len(completions)
+                count        += len(completions)
+                epoch_reward_sum += sum(rewards)
+                for r in rewards:
+                    step_rewards.append(r)
+                    step_losses.append(0.0)
+                    step_advantages.append(0.0)
+                continue
 
             # ----------------------------------------------------------------
             # Phase 2: update the policy using advantage-weighted loss
             # ----------------------------------------------------------------
             for completion, reward, advantage in zip(completions, rewards, advantages):
                 optimizer.zero_grad()
-                loss = advantage_weighted_loss(policy_model, policy_tokenizer, completion, advantage)
+                loss = advantage_weighted_loss(policy_model, policy_tokenizer, prompt, completion, advantage)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(policy_model.parameters(), 1.0)
                 optimizer.step()
