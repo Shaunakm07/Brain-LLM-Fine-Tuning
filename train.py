@@ -49,8 +49,9 @@ COMPONENT 2 — KL penalty
     still allowing it to improve on the reward signal. This is the same
     mechanism used in PPO and RLHF.
 
-    kl_coef controls the trade-off:
+    kl_coef controls the trade-off (default 0.5 — tuned from observed KL spikes):
       - Too low  → policy drifts, loss increases, potential reward hacking
+                   (0.1 was too weak: KL spiked to 11+ in early training)
       - Too high → policy can't move far enough to improve reward
 
 WHY A SEPARATE, LARGER REWARD MODEL?
@@ -346,7 +347,7 @@ def advantage_weighted_loss(
     prompt: str,
     completion: str,
     advantage: float,
-    kl_coef: float = 0.1,
+    kl_coef: float = 0.5,
 ) -> tuple[torch.Tensor, float]:
     """
     Compute advantage-weighted cross-entropy loss with a KL penalty.
@@ -388,7 +389,7 @@ def advantage_weighted_loss(
         prompt:     The original user prompt
         completion: The generated response string
         advantage:  Normalised advantage scalar (can be negative)
-        kl_coef:    Weight of the KL penalty (default 0.1)
+        kl_coef:    Weight of the KL penalty (default 0.5)
 
     Returns:
         (total_loss tensor, kl_value float) — kl_value logged separately for monitoring

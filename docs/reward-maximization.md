@@ -11,11 +11,12 @@ This document explains how `train.py` fine-tunes a small LLM using a second, lar
 3. [The Optimisation Method — Advantage-Weighted SFT](#the-optimisation-method--advantage-weighted-sft)
 4. [Why Advantage Instead of Raw Reward](#why-advantage-instead-of-raw-reward)
 5. [Why Loss Increases Over Time — and the KL Penalty Fix](#why-loss-increases-over-time--and-the-kl-penalty-fix)
-6. [Running train.py](#running-trainpy)
-7. [What the Outputs Mean](#what-the-outputs-mean)
-8. [Hyperparameter Guide](#hyperparameter-guide)
-9. [Common Failure Modes](#common-failure-modes)
-10. [Other Methods](#other-methods)
+6. [Choosing Effective Criteria](#choosing-effective-criteria)
+7. [Running train.py](#running-trainpy)
+8. [What the Outputs Mean](#what-the-outputs-mean)
+9. [Hyperparameter Guide](#hyperparameter-guide)
+10. [Common Failure Modes](#common-failure-modes)
+11. [Other Methods](#other-methods)
 
 ---
 
@@ -156,7 +157,7 @@ The parameter `β` (here `kl_coef`) controls the trade-off:
 - **Too low**: policy drifts → CE rises → potential reward hacking
 - **Too high**: policy can't move far enough to improve reward
 
-The default `kl_coef=0.1` is a reasonable starting point. If you see KL rising steadily in the training plot, increase it. If reward stops improving, reduce it.
+The default is `kl_coef=0.5`. This was raised from an initial value of 0.1 after observing KL spike to **11+** in early training with the lower value — the policy drifted significantly within the first epoch, which caused reward to improve briefly then collapse. If you see KL staying below 0.5 throughout, you may be able to lower it to 0.3. If KL still spikes above 2–3, raise it to 1.0.
 
 ### What "anchor" means in practice
 
@@ -171,6 +172,34 @@ Base model weights (frozen, never change)
 ```
 
 The policy is free to differ from the reference — the KL penalty only makes large drift increasingly costly, not impossible.
+
+---
+
+## Choosing Effective Criteria
+
+The criteria string is the most important hyperparameter. A poor choice causes the majority of training steps to be **skipped** because the judge scores all completions identically.
+
+### Why groups get skipped
+
+If the base model already handles a criteria well (e.g., "be helpful"), the judge scores every completion ~0.8 and the group std is near zero — advantage is undefined, and the step is skipped. No gradient flows.
+
+Observed in practice with `--criteria "use bullet points and keep responses under 3 sentences"`: the 0.5B base model already produces bullet-point responses frequently, so the judge scored most groups identically and over half of all steps were skipped.
+
+### What makes a good criteria
+
+The criteria should describe something the **base model clearly struggles with** — so completions vary widely in quality and the judge can discriminate.
+
+| Criteria type | Skip rate | Why |
+|--------------|-----------|-----|
+| `"be helpful and concise"` | Very high | Base model already does this |
+| `"use bullet points"` | High | Qwen 0.5B naturally uses bullets |
+| `"respond only using an analogy to cooking"` | Low | Model rarely does this unprompted |
+| `"answer in exactly 3 numbered steps, no more"` | Low | Model frequently violates this |
+| `"use no adjectives or adverbs"` | Low | Hard constraint, model often fails it |
+
+### Rule of thumb
+
+Run 1 epoch with a small `--completions 2` and watch the console. If you see `[Skip]` on more than ~30% of prompts, the criteria is too easy — make it more specific or more unusual.
 
 ---
 
@@ -217,7 +246,7 @@ python train.py --criteria "detailed answers with examples" --prompts_file promp
 | `--completions` | 4 | Completions per prompt per epoch — more = better advantage estimates |
 | `--output_dir` | `./lora-adapter` | Where to save adapter weights, metrics, and plots |
 
-`kl_coef` (default `0.1`) is set directly in `advantage_weighted_loss()` in `train.py`. Increase it if loss rises steadily; decrease it if reward stops improving.
+`kl_coef` (default `0.5`) is set directly in `advantage_weighted_loss()` in `train.py`. Increase it if KL spikes above 2–3 or loss rises steadily; decrease it if reward plateaus and KL stays very low.
 
 ### After training — load the adapter
 
@@ -271,8 +300,9 @@ Epoch 1/5 | Step 4 | Reward: 0.30 | Advantage: -1.41 | Loss: -0.62 | KL: 0.0041 
 | Training very slow on CPU | Reduce `--completions` to 2, reduce `--epochs`, shorten `max_new_tokens` in `generate_completion()` |
 | Want stronger adaptation | Increase `--lora_r` to 16 or 32 |
 | Reward improving then collapsing | Lower `--lr` to 5e-5 |
-| Loss rising monotonically | KL penalty is too weak — increase `kl_coef` (default 0.1) to 0.2 or 0.5 in `advantage_weighted_loss()` |
-| Reward plateaus, KL is very low | KL penalty is too strong — reduce `kl_coef` to let the policy move further |
+| Loss rising monotonically | KL penalty is too weak — increase `kl_coef` (default 0.5) to 1.0 in `advantage_weighted_loss()` |
+| KL spikes above 2–3 in early training | Same cause — increase `kl_coef`; observed in practice: KL hit 11+ with `kl_coef=0.1` |
+| Reward plateaus, KL stays below 0.1 | KL penalty too strong — reduce `kl_coef` to 0.2–0.3 to let the policy move further |
 
 ---
 
@@ -280,8 +310,8 @@ Epoch 1/5 | Step 4 | Reward: 0.30 | Advantage: -1.41 | Loss: -0.62 | KL: 0.0041 
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| Advantage always 0.0 | All completions scored identically | Judge model too small, or criteria too vague — use a clearer criteria |
-| Reward flat across all epochs | Too few steps | More prompts, more completions, more epochs |
+| Advantage always 0.0 / frequent `[Skip]` | All completions scored identically | Criteria too easy for the base model — use a harder, more unusual criteria (see [Choosing Effective Criteria](#choosing-effective-criteria)) |
+| Reward flat across all epochs | Too few training steps, or too many skips | More prompts, more completions, harder criteria |
 | Loss NaN | LR too high | Reduce `--lr` by 10× |
 | Reward improves then crashes | Reward hacking / over-optimisation | Lower `--lr`, reduce epochs, increase `kl_coef` |
 | Judge always returns 0.5 | Score parsing failed | Check terminal for `[Warning]` lines — the judge may not be following instructions |
