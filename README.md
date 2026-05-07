@@ -16,13 +16,22 @@ A toolkit for fine-tuning small LLMs locally using LoRA, with support for custom
 ## Quickstart
 
 ```bash
-pip install torch transformers peft trl datasets accelerate bitsandbytes
+pip install torch transformers peft matplotlib
 
 # Run local inference
 python inference.py
+
+# Fine-tune with a local LLM judge
+python train.py --criteria "responses should be concise and use simple language"
+
+# Fine-tune with your own prompts
+python train.py --criteria "formal and professional tone" \
+                --prompts "Explain gravity" "What is DNA?" "How do computers work?"
 ```
 
-The inference script runs `Qwen2.5-0.5B-Instruct` on your local machine via the MPS backend (Apple Silicon). See [`inference.py`](inference.py) for details.
+`inference.py` runs `Qwen2.5-0.5B-Instruct` locally on CPU (Apple Silicon compatible). See [`inference.py`](inference.py) for details.
+
+`train.py` fine-tunes the policy model using a separate frozen judge model (`Qwen2.5-1.5B-Instruct`) as the reward signal. See [`docs/reward-maximization.md`](docs/reward-maximization.md) for how it works.
 
 ---
 
