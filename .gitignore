@@ -62,6 +62,9 @@ output/
 outputs/
 results/
 generated/
+tribe-cache/
+tribe-output/
+lora-adapter/
 
 # macOS
 .DS_Store
