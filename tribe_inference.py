@@ -369,6 +369,120 @@ def plot_results(preds: np.ndarray, output_dir: str, title_prefix: str = ""):
     print(f"  Peak vertex        : {stats['peak_vertex']} (mean BOLD = {stats['peak_activation']:.4f})")
 
 
+def plot_brain_surface(preds: np.ndarray, output_dir: str, title_prefix: str = ""):
+    """
+    Render mean predicted BOLD on the fsaverage5 cortical surface.
+
+    Produces a 4-panel figure showing the time-averaged cortical activation
+    mapped onto the inflated brain surface from 4 viewpoints:
+      - Left hemisphere: lateral view  (outer surface, language/temporal areas)
+      - Left hemisphere: medial view   (inner surface, default mode network)
+      - Right hemisphere: lateral view
+      - Right hemisphere: medial view
+
+    The background uses sulcal depth (gyri bright, sulci dark) for anatomical
+    orientation. Color scale is symmetric around zero so positive (red) and
+    negative (blue) deflections are clearly distinguishable.
+
+    Args:
+        preds:      (n_timesteps, 20484) predicted BOLD array
+        output_dir: Directory to save the plot
+        title_prefix: Optional string prepended to the plot title
+    """
+    try:
+        from nilearn import plotting, datasets
+        import matplotlib.image as mpimg
+        from matplotlib.cm import ScalarMappable
+        from matplotlib.colors import Normalize
+    except ImportError:
+        print("nilearn not installed — skipping surface plot. Run: pip install nilearn")
+        return
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Average over time → (20484,) mean activation per vertex
+    mean_act   = preds.mean(axis=0)
+    left_data  = mean_act[:10242]   # fsaverage5 left hemisphere vertices
+    right_data = mean_act[10242:]   # fsaverage5 right hemisphere vertices
+
+    # Fetch fsaverage5 surface files (cached after first download, ~20 MB)
+    print("Fetching fsaverage5 surface mesh (cached after first download)...")
+    fsaverage = datasets.fetch_surf_fsaverage("fsaverage5")
+
+    # Symmetric color scale so zero is white/neutral
+    vmax = float(np.abs(mean_act).max())
+    if vmax == 0:
+        vmax = 1.0   # avoid degenerate colorbar
+
+    # Four views: (hemi, view, data, surface_mesh, bg_map)
+    views = [
+        ("left",  "lateral", left_data,  fsaverage["infl_left"],  fsaverage["sulc_left"]),
+        ("left",  "medial",  left_data,  fsaverage["infl_left"],  fsaverage["sulc_left"]),
+        ("right", "lateral", right_data, fsaverage["infl_right"], fsaverage["sulc_right"]),
+        ("right", "medial",  right_data, fsaverage["infl_right"], fsaverage["sulc_right"]),
+    ]
+
+    panel_titles = [
+        "Left Hemisphere — Lateral",
+        "Left Hemisphere — Medial",
+        "Right Hemisphere — Lateral",
+        "Right Hemisphere — Medial",
+    ]
+
+    # Render each view to a temporary PNG, then stitch them into one figure.
+    # nilearn's plot_surf_stat_map creates its own 3-D figure internally, so
+    # the easiest cross-version approach is to write each panel to disk first.
+    panel_images = []
+    for hemi, view, data, surf_mesh, bg_map in views:
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            tmp_path = tmp.name
+        plotting.plot_surf_stat_map(
+            surf_mesh=surf_mesh,
+            stat_map=data,
+            hemi=hemi,
+            view=view,
+            bg_map=bg_map,
+            bg_on_data=True,
+            darkness=0.5,
+            colorbar=False,
+            cmap="RdBu_r",
+            vmax=vmax,
+            output_file=tmp_path,
+        )
+        panel_images.append(tmp_path)
+
+    # Build the stitched 2×2 figure
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    for ax, img_path, panel_title in zip(axes.flat, panel_images, panel_titles):
+        img = mpimg.imread(img_path)
+        ax.imshow(img)
+        ax.set_title(panel_title, fontweight="bold", fontsize=11)
+        ax.axis("off")
+        os.unlink(img_path)   # clean up temp file
+
+    fig.suptitle(
+        f"{title_prefix}TRIBE v2 — Mean Predicted BOLD on Cortical Surface\n"
+        f"Inflated fsaverage5 | colormap: RdBu_r (red=positive, blue=negative) | "
+        f"vmax={vmax:.3f}",
+        fontsize=12, fontweight="bold",
+    )
+
+    # Shared horizontal colorbar beneath all panels
+    sm   = ScalarMappable(cmap="RdBu_r", norm=Normalize(vmin=-vmax, vmax=vmax))
+    sm.set_array([])
+    cbar = fig.colorbar(
+        sm, ax=axes.ravel().tolist(),
+        orientation="horizontal",
+        fraction=0.02, pad=0.04, shrink=0.55,
+    )
+    cbar.set_label("Mean Predicted BOLD (z-score)", fontsize=10)
+
+    surface_path = os.path.join(output_dir, "tribe_brain_surface.png")
+    plt.savefig(surface_path, dpi=150, bbox_inches="tight")
+    plt.show()
+    print(f"Surface plot saved to {surface_path}")
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
@@ -449,5 +563,8 @@ Examples:
         np.save(args.output, preds)
         print(f"Predictions saved to {args.output}  shape={preds.shape}")
 
-    # Plot
+    # Plot time-series / heatmap panels
     plot_results(preds, output_dir=args.output_dir, title_prefix=title_prefix)
+
+    # Plot mean BOLD on the 3-D cortical surface
+    plot_brain_surface(preds, output_dir=args.output_dir, title_prefix=title_prefix)
