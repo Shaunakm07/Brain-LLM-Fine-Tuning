@@ -81,10 +81,17 @@ _original_subprocess_run = subprocess.run
 def _patched_subprocess_run(args, **kwargs):
     if isinstance(args, (list, tuple)):
         args = list(args)
-        # Detect whisperx invocation (direct or via uv/python)
         cmd_str = " ".join(str(a) for a in args)
-        if "whisperx" in cmd_str and "--compute_type" not in cmd_str:
-            args = args + ["--compute_type", "int8"]
+        if "whisperx" in cmd_str:
+            # tribev2 hardcodes compute_type="float16" regardless of device.
+            # float16 crashes on Mac/CPU with ctranslate2. Replace with int8,
+            # which is fully supported on CPU.
+            if "--compute_type" in args:
+                idx = args.index("--compute_type")
+                if idx + 1 < len(args) and args[idx + 1] == "float16":
+                    args[idx + 1] = "int8"
+            else:
+                args = args + ["--compute_type", "int8"]
     return _original_subprocess_run(args, **kwargs)
 
 subprocess.run = _patched_subprocess_run
@@ -112,9 +119,29 @@ def load_model(cache_folder: str = "./tribe-cache"):
             '  pip install "tribev2[plotting] @ git+https://github.com/facebookresearch/tribev2.git"'
         )
 
-    print("Loading TRIBE v2 from facebook/tribev2...")
+    # Determine best available device.
+    # Use cpu even on Apple Silicon — LLaMA 3.2-3B has known MPS issues and
+    # the image sub-configs in tribev2 use strict pydantic models that reject
+    # device overrides via the nested dot-path config_update mechanism.
+    import torch
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    # config.yaml hardcodes device: cuda for the main feature extractors.
+    # Only the top-level device fields can be safely overridden via config_update;
+    # the nested image sub-configs use strict pydantic and reject extra fields.
+    config_update = {
+        "data.text_feature.device":  device,
+        "data.audio_feature.device": device,
+    }
+
+    print(f"Loading TRIBE v2 from facebook/tribev2 (device: {device})...")
     print("  (First run downloads ~710 MB checkpoint — this may take a few minutes)")
-    model = TribeModel.from_pretrained("facebook/tribev2", cache_folder=cache_folder)
+    model = TribeModel.from_pretrained(
+        "facebook/tribev2",
+        cache_folder=cache_folder,
+        device=device,
+        config_update=config_update,
+    )
     print("Model ready.\n")
     return model
 
