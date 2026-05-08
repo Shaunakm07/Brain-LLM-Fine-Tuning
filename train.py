@@ -202,7 +202,9 @@ def score_completion(
     Ask the reward model to score a completion on a scale of 1–10.
 
     The judge receives the criteria, the original prompt, and the completion.
-    It replies with a single integer which we normalise to [0.1, 1.0].
+    It replies with a decimal score (e.g. 7.5) which we normalise to [0.1, 1.0].
+    Decimal scores give finer reward signal than integers — more variance across
+    completions means fewer skipped steps.
 
     Greedy decoding (do_sample=False) is used so scoring is deterministic —
     the same completion always gets the same score, making training stable.
@@ -222,11 +224,12 @@ def score_completion(
         f"Criteria: {criteria}\n\n"
         f"Prompt: {prompt}\n"
         f"Response: {completion}\n\n"
-        f"Score this response from 1 (worst) to 10 (best) based strictly on "
-        f"the criteria above. Reply with only a single integer. Score:"
+        f"Score this response from 1.0 (worst) to 10.0 (best) based strictly on "
+        f"the criteria above. You may use one decimal place for precision (e.g. 6.5). "
+        f"Reply with only the number. Score:"
     )
     messages = [
-        {"role": "system", "content": "You are a strict evaluator. You must reply with only a single integer from 1 to 10."},
+        {"role": "system", "content": "You are a strict evaluator. Reply with only a single number from 1.0 to 10.0. One decimal place is allowed for precision. Do not write anything else."},
         {"role": "user",   "content": judge_prompt},
     ]
 
@@ -236,7 +239,7 @@ def score_completion(
     with torch.no_grad():
         outputs = reward_model.generate(
             **inputs,
-            max_new_tokens=5,
+            max_new_tokens=8,   # enough for "10.0" or "7.5" plus any leading space
             do_sample=False,
             pad_token_id=reward_tokenizer.eos_token_id,
         )
@@ -244,10 +247,13 @@ def score_completion(
     new_tokens = outputs[0][inputs["input_ids"].shape[-1]:]
     raw        = reward_tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
 
+    # Try to parse a float from any token in the output
     for token in raw.split():
+        cleaned = "".join(c for c in token if c.isdigit() or c == ".")
         try:
-            score = int("".join(c for c in token if c.isdigit()))
-            return max(1, min(10, score)) / 10.0
+            score = float(cleaned)
+            if 1.0 <= score <= 10.0:
+                return score / 10.0
         except ValueError:
             continue
 
