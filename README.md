@@ -32,6 +32,10 @@ python compare.py --adapter ./lora-adapter \
                   --prompts_file prompts.txt \
                   --criteria "concise and uses simple language" \
                   --judge
+
+# Run TRIBE v2 — predict brain activity from text
+pip install "tribev2[plotting] @ git+https://github.com/facebookresearch/tribev2.git"
+python tribe_inference.py --prompt "The scientist examined the brain scans."
 ```
 
 `inference.py` runs `Qwen2.5-0.5B-Instruct` locally. See [`inference.py`](inference.py) for details.
@@ -50,6 +54,7 @@ python compare.py --adapter ./lora-adapter \
 | [Optimization Functions](docs/optimization-functions.md) | Loss functions (cross-entropy, focal, DPO, contrastive, reward-weighted) and optimizers (AdamW, Lion, Adafactor, GaLore) |
 | [Training Pipeline](docs/training-pipeline.md) | End-to-end fine-tuning example with a custom trainer |
 | [Reward Maximisation](docs/reward-maximization.md) | Fine-tuning to maximise the output of another model (GRPO, PPO, DPO, reward-weighted SFT) |
+| [TRIBE v2 Model](docs/tribe-model.md) | How TRIBE v2 predicts fMRI brain activity from text — architecture, text pipeline, output format |
 
 ---
 
