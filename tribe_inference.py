@@ -444,7 +444,6 @@ def plot_brain_surface(preds: np.ndarray, output_dir: str, title_prefix: str = "
             view=view,
             bg_map=bg_map,
             bg_on_data=True,
-            darkness=0.5,
             colorbar=False,
             cmap="RdBu_r",
             vmax=vmax,
