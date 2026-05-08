@@ -391,12 +391,13 @@ def plot_brain_surface(preds: np.ndarray, output_dir: str, title_prefix: str = "
     """
     try:
         from nilearn import plotting, datasets
-        import matplotlib.image as mpimg
-        from matplotlib.cm import ScalarMappable
-        from matplotlib.colors import Normalize
     except ImportError:
         print("nilearn not installed — skipping surface plot. Run: pip install nilearn")
         return
+
+    import matplotlib.image as mpimg
+    from matplotlib.cm import ScalarMappable
+    from matplotlib.colors import Normalize
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -430,13 +431,13 @@ def plot_brain_surface(preds: np.ndarray, output_dir: str, title_prefix: str = "
     ]
 
     # Render each view to a temporary PNG, then stitch them into one figure.
-    # nilearn's plot_surf_stat_map creates its own 3-D figure internally, so
-    # the easiest cross-version approach is to write each panel to disk first.
+    # Capture the returned matplotlib Figure and call .savefig() directly —
+    # nilearn's output_file parameter is unreliable across versions, and
+    # engine='matplotlib' is required to ensure we get a Figure back rather
+    # than a plotly object (nilearn v0.10+ supports both engines).
     panel_images = []
     for hemi, view, data, surf_mesh, bg_map in views:
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-            tmp_path = tmp.name
-        plotting.plot_surf_stat_map(
+        surf_fig = plotting.plot_surf_stat_map(
             surf_mesh=surf_mesh,
             stat_map=data,
             hemi=hemi,
@@ -447,8 +448,12 @@ def plot_brain_surface(preds: np.ndarray, output_dir: str, title_prefix: str = "
             colorbar=False,
             cmap="RdBu_r",
             vmax=vmax,
-            output_file=tmp_path,
+            engine="matplotlib",
         )
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            tmp_path = tmp.name
+        surf_fig.savefig(tmp_path, dpi=100, bbox_inches="tight")
+        plt.close(surf_fig)
         panel_images.append(tmp_path)
 
     # Build the stitched 2×2 figure
