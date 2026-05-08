@@ -25,11 +25,18 @@ Output shape: (n_seconds, 20484) where 20484 = fsaverage5 cortical vertices
 
 REQUIREMENTS
 ------------
+  brew install ffmpeg                  # required for audio decoding (torchcodec)
   pip install "tribev2[plotting] @ git+https://github.com/facebookresearch/tribev2.git"
   pip install numpy matplotlib scipy
 
   LLaMA access: you must accept the LLaMA 3.2 license on HuggingFace and run:
     huggingface-cli login
+
+MAC / CPU NOTE
+--------------
+  ctranslate2 (used by WhisperX internally) defaults to float16 compute type,
+  which is not supported on CPU or Apple Silicon. This script patches the
+  subprocess call to force --compute_type int8 before tribev2 is imported.
 
 USAGE
 -----
@@ -49,10 +56,38 @@ USAGE
 import os
 import argparse
 import tempfile
+import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Mac / CPU compatibility patch — must run before tribev2 is imported
+# ---------------------------------------------------------------------------
+#
+# tribev2 calls WhisperX as a subprocess to transcribe synthesised speech.
+# WhisperX defaults to float16 compute type via ctranslate2, which crashes
+# on Mac CPU with:
+#   ValueError: Requested float16 compute type, but the target device or
+#   backend do not support efficient float16 computation.
+#
+# Fix: intercept subprocess.run and inject --compute_type int8 whenever a
+# whisperx command is detected. int8 is fully supported on CPU and only
+# marginally slower than float16 on GPU.
+
+_original_subprocess_run = subprocess.run
+
+def _patched_subprocess_run(args, **kwargs):
+    if isinstance(args, (list, tuple)):
+        args = list(args)
+        # Detect whisperx invocation (direct or via uv/python)
+        cmd_str = " ".join(str(a) for a in args)
+        if "whisperx" in cmd_str and "--compute_type" not in cmd_str:
+            args = args + ["--compute_type", "int8"]
+    return _original_subprocess_run(args, **kwargs)
+
+subprocess.run = _patched_subprocess_run
 
 # ---------------------------------------------------------------------------
 # Helpers
