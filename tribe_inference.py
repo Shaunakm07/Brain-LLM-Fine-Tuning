@@ -54,6 +54,7 @@ USAGE
 """
 
 import os
+import warnings
 import argparse
 import tempfile
 import subprocess
@@ -187,40 +188,314 @@ def run_on_audio(model, audio_path: str):
 
 
 # ---------------------------------------------------------------------------
-# Analysis utilities
+# Atlas-based ROI extraction  (Destrieux atlas on fsaverage5)
 # ---------------------------------------------------------------------------
+#
+# TRIBE v2 outputs predictions on the fsaverage5 cortical surface mesh:
+#   - 20484 vertices total  (10242 per hemisphere)
+#   - Left  hemisphere: vertex indices 0 – 10241
+#   - Right hemisphere: vertex indices 10242 – 20483
+#
+# We use the Destrieux (aparc.a2009s) parcellation, which nilearn provides
+# natively on fsaverage5.  Each hemisphere has 75 labelled regions covering
+# the entire cortical surface.  See:
+#   Destrieux et al. (2010) Neuroimage 53:1–15
+#   https://nilearn.github.io/stable/modules/generated/nilearn.datasets.fetch_atlas_surf_destrieux.html
+#
+# FRIENDLY_ROIS maps short, human-readable names to one or more Destrieux
+# label strings and the hemisphere(s) to include.  "bilateral" combines
+# both hemispheres; "left" / "right" use only one hemisphere.
+#
+# Destrieux gyrus/sulcus naming convention:
+#   G_  = gyrus    S_  = sulcus    Lat_Fis = lateral fissure
+#   front = frontal   temp = temporal   pariet = parietal   occipital
+#   inf/sup/mid = inferior/superior/middle
 
-# fsaverage5 vertex index ranges for approximate ROIs.
-# These are rough but usable — for precise ROIs use nilearn's atlas-based masking.
-#
-# fsaverage5 has 10242 vertices per hemisphere, 20484 total.
-# Left hemisphere: indices 0–10241
-# Right hemisphere: indices 10242–20483
-#
-# These approximate ranges come from the known topology of the fsaverage5 mesh.
-APPROXIMATE_ROIS = {
-    "Left Temporal (language/auditory)": (1800, 2500),
-    "Right Temporal (auditory)":         (12042, 12742),
-    "Left Frontal (Broca)":              (500,  900),
-    "Left Parietal (integration)":       (3000, 3500),
-    "Left Occipital (visual)":           (4000, 4600),
-    "Right Occipital (visual)":          (14242, 14842),
+FRIENDLY_ROIS = {
+    # Language production — Broca's area (pars opercularis + pars triangularis)
+    "broca": {
+        "labels": ["G_front_inf-Opercular", "G_front_inf-Triangul"],
+        "hemi": "left",
+        "description": "Broca's area (IFG pars opercularis + triangularis, left)",
+    },
+    # Language comprehension — Wernicke's area (posterior STG + STS)
+    "wernicke": {
+        "labels": ["G_temp_sup-Lateral", "S_temporal_sup"],
+        "hemi": "left",
+        "description": "Wernicke's area (posterior superior temporal, left)",
+    },
+    # Primary auditory cortex — Heschl's gyrus (transverse temporal gyrus)
+    "auditory": {
+        "labels": ["G_temp_sup-G_T_transv", "S_temporal_transverse"],
+        "hemi": "bilateral",
+        "description": "Primary auditory cortex (Heschl's gyrus, bilateral)",
+    },
+    # Superior temporal sulcus — multimodal speech/language integration
+    "sts": {
+        "labels": ["Lat_Fis-post", "G_temp_sup-Plan_tempo"],
+        "hemi": "bilateral",
+        "description": "Superior temporal sulcus / planum temporale (bilateral)",
+    },
+    # Angular gyrus — semantic integration, reading, default mode
+    "angular": {
+        "labels": ["G_pariet_inf-Angular"],
+        "hemi": "left",
+        "description": "Angular gyrus (left inferior parietal)",
+    },
+    # Supramarginal gyrus — phonological working memory
+    "supramarginal": {
+        "labels": ["G_pariet_inf-Supramar"],
+        "hemi": "left",
+        "description": "Supramarginal gyrus (left inferior parietal)",
+    },
+    # Default mode network core — posterior cingulate + precuneus
+    "default_mode": {
+        "labels": ["G_cingul-Post-dorsal", "G_cingul-Post-ventral", "G_precuneus"],
+        "hemi": "bilateral",
+        "description": "Default mode network (posterior cingulate + precuneus)",
+    },
+    # Anterior cingulate — cognitive control, salience
+    "anterior_cingulate": {
+        "labels": ["G_and_S_cingul-Ant", "G_and_S_cingul-Mid-Ant"],
+        "hemi": "bilateral",
+        "description": "Anterior cingulate cortex",
+    },
+    # Dorsolateral prefrontal — working memory, executive function
+    "dlpfc": {
+        "labels": ["G_front_middle", "S_front_middle"],
+        "hemi": "bilateral",
+        "description": "Dorsolateral prefrontal cortex",
+    },
+    # Superior frontal gyrus — high-level cognition, self-referential processing
+    "superior_frontal": {
+        "labels": ["G_front_sup", "S_front_sup"],
+        "hemi": "bilateral",
+        "description": "Superior frontal gyrus",
+    },
+    # Primary visual cortex — calcarine sulcus (V1)
+    "v1": {
+        "labels": ["S_calcarine"],
+        "hemi": "bilateral",
+        "description": "Primary visual cortex (V1, calcarine sulcus)",
+    },
+    # Lateral occipital — higher-order visual processing
+    "lateral_occipital": {
+        "labels": ["G_occipital_middle", "G_occipital_sup", "S_oc_middle_and_Lunatus"],
+        "hemi": "bilateral",
+        "description": "Lateral occipital cortex",
+    },
+    # Fusiform gyrus — word-form recognition, face processing
+    "fusiform": {
+        "labels": ["G_oc-temp_lat-fusifor"],
+        "hemi": "bilateral",
+        "description": "Fusiform gyrus (visual word-form area region)",
+    },
+    # Parahippocampal gyrus — scene/context memory
+    "parahippocampal": {
+        "labels": ["G_oc-temp_med-Parahip"],
+        "hemi": "bilateral",
+        "description": "Parahippocampal gyrus",
+    },
+    # Insula — salience, interoception, speech articulation
+    "insula": {
+        "labels": ["G_insular_short", "G_Ins_lg_and_S_cent_ins"],
+        "hemi": "bilateral",
+        "description": "Insula",
+    },
+    # Middle temporal gyrus — semantic memory, narrative
+    "middle_temporal": {
+        "labels": ["G_temporal_middle", "S_temporal_inf"],
+        "hemi": "bilateral",
+        "description": "Middle temporal gyrus",
+    },
+    # Inferior temporal gyrus — object recognition, semantic access
+    "inferior_temporal": {
+        "labels": ["G_temporal_inf"],
+        "hemi": "bilateral",
+        "description": "Inferior temporal gyrus",
+    },
+    # Superior parietal lobule — spatial attention
+    "superior_parietal": {
+        "labels": ["G_parietal_sup", "S_intrapariet_and_P_trans"],
+        "hemi": "bilateral",
+        "description": "Superior parietal lobule",
+    },
+    # Motor cortex — precentral gyrus
+    "motor": {
+        "labels": ["G_precentral", "S_precentral-inf-part", "S_precentral-sup-part"],
+        "hemi": "bilateral",
+        "description": "Primary motor cortex (precentral gyrus)",
+    },
+    # Somatosensory cortex
+    "somatosensory": {
+        "labels": ["G_postcentral", "S_postcentral", "S_central"],
+        "hemi": "bilateral",
+        "description": "Primary somatosensory cortex (postcentral gyrus)",
+    },
 }
 
+# Module-level cache so the atlas is only loaded once per process
+_ATLAS_CACHE: dict = {}
 
-def roi_timeseries(preds: np.ndarray) -> dict:
+
+def load_destrieux_atlas() -> dict:
     """
-    Extract mean BOLD timeseries for approximate cortical ROIs.
+    Load the Destrieux surface parcellation for fsaverage5.
+
+    Downloads on first call (~500 KB), then cached on disk by nilearn.
+    Returns a dict with keys:
+        'labels_left'  : (10242,) int array — Destrieux label index per vertex, left hemi
+        'labels_right' : (10242,) int array — same for right hemisphere
+        'label_names'  : list[str]           — label name for each index (index 0 = Unknown)
+
+    The label_names list has 76 entries (0 = Unknown, 1–75 = named Destrieux regions).
+    Vertex indices in labels_left/right range from 1 to 75; 0 = unlabelled medial wall.
+    """
+    global _ATLAS_CACHE
+    if _ATLAS_CACHE:
+        return _ATLAS_CACHE
+
+    try:
+        from nilearn import datasets, surface as nilearn_surface
+    except ImportError:
+        raise ImportError("nilearn is required for atlas ROI extraction. Run: pip install nilearn")
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        destrieux = datasets.fetch_atlas_surf_destrieux()
+
+    # map_left / map_right are already (10242,) numpy arrays in nilearn 0.13
+    labels_left  = np.asarray(destrieux["map_left"],  dtype=np.int32)
+    labels_right = np.asarray(destrieux["map_right"], dtype=np.int32)
+
+    _ATLAS_CACHE = {
+        "labels_left":  labels_left,
+        "labels_right": labels_right,
+        "label_names":  list(destrieux["labels"]),
+    }
+    return _ATLAS_CACHE
+
+
+def _resolve_vertices(roi_key: str, atlas: dict) -> np.ndarray:
+    """
+    Return the global vertex indices (0–20483) for a named ROI.
+
+    Left hemisphere vertices: 0–10241 (atlas labels_left)
+    Right hemisphere vertices: 10242–20483 (atlas labels_right + 10242 offset)
+
+    Args:
+        roi_key: Key in FRIENDLY_ROIS (e.g. "broca", "auditory")
+        atlas:   Dict returned by load_destrieux_atlas()
+
+    Returns:
+        1-D integer array of vertex indices into the (20484,) prediction array.
+    """
+    if roi_key not in FRIENDLY_ROIS:
+        available = ", ".join(sorted(FRIENDLY_ROIS))
+        raise ValueError(f"Unknown ROI '{roi_key}'. Available: {available}")
+
+    roi_def      = FRIENDLY_ROIS[roi_key]
+    label_names  = atlas["label_names"]
+    labels_left  = atlas["labels_left"]
+    labels_right = atlas["labels_right"]
+
+    # Resolve Destrieux label names → integer indices
+    label_indices = []
+    for name in roi_def["labels"]:
+        if name in label_names:
+            label_indices.append(label_names.index(name))
+        # silently skip names not present in this atlas version
+
+    if not label_indices:
+        raise ValueError(f"None of the Destrieux labels for '{roi_key}' found in atlas.")
+
+    hemi = roi_def["hemi"]
+    verts = []
+
+    if hemi in ("left", "bilateral"):
+        for idx in label_indices:
+            verts.extend(np.where(labels_left == idx)[0].tolist())
+
+    if hemi in ("right", "bilateral"):
+        for idx in label_indices:
+            # right hemisphere vertices are offset by 10242 in the global array
+            verts.extend((np.where(labels_right == idx)[0] + 10242).tolist())
+
+    return np.array(sorted(set(verts)), dtype=np.int32)
+
+
+def extract_region_activity(preds: np.ndarray, roi_key: str, atlas: dict | None = None) -> np.ndarray:
+    """
+    Extract mean BOLD timeseries for a named brain region.
+
+    Uses the Destrieux atlas parcellation on fsaverage5 to identify which of
+    the 20484 cortical vertices belong to the requested region, then averages
+    predicted BOLD across those vertices at each timestep.
+
+    Args:
+        preds:   (n_timesteps, 20484) predicted BOLD array from TRIBE v2
+        roi_key: Short region name — one of the keys in FRIENDLY_ROIS
+                 e.g. "broca", "auditory", "default_mode"
+        atlas:   Pre-loaded atlas dict (from load_destrieux_atlas()).
+                 If None, loads the atlas automatically.
+
+    Returns:
+        (n_timesteps,) array of mean predicted BOLD in the requested region.
+
+    Example:
+        atlas  = load_destrieux_atlas()
+        preds, _ = run_on_text(model, "path/to/text.txt")
+        broca_ts = extract_region_activity(preds, "broca", atlas)
+        print(f"Mean Broca activation: {broca_ts.mean():.4f}")
+    """
+    if atlas is None:
+        atlas = load_destrieux_atlas()
+
+    vertices = _resolve_vertices(roi_key, atlas)
+    return preds[:, vertices].mean(axis=1)
+
+
+def list_available_regions(atlas: dict | None = None) -> None:
+    """
+    Print a table of all available named brain regions with vertex counts.
+
+    Args:
+        atlas: Pre-loaded atlas dict. If None, loads automatically.
+    """
+    if atlas is None:
+        atlas = load_destrieux_atlas()
+
+    print(f"\n{'Region key':<22}  {'Hemi':<10}  {'Vertices':>8}  Description")
+    print("-" * 80)
+    for key in sorted(FRIENDLY_ROIS):
+        try:
+            verts = _resolve_vertices(key, atlas)
+            hemi  = FRIENDLY_ROIS[key]["hemi"]
+            desc  = FRIENDLY_ROIS[key]["description"]
+            print(f"  {key:<20}  {hemi:<10}  {len(verts):>8}  {desc}")
+        except ValueError as e:
+            print(f"  {key:<20}  (error: {e})")
+    print()
+
+
+def roi_timeseries(preds: np.ndarray, atlas: dict | None = None) -> dict:
+    """
+    Extract mean BOLD timeseries for all FRIENDLY_ROIS.
+
+    Uses the Destrieux atlas for accurate vertex selection.
 
     Args:
         preds: (n_timesteps, 20484) predicted BOLD array
+        atlas: Pre-loaded atlas dict (loads automatically if None)
 
     Returns:
-        dict mapping ROI name → mean timeseries array of shape (n_timesteps,)
+        dict mapping region key → mean timeseries array of shape (n_timesteps,)
     """
+    if atlas is None:
+        atlas = load_destrieux_atlas()
     return {
-        name: preds[:, start:end].mean(axis=1)
-        for name, (start, end) in APPROXIMATE_ROIS.items()
+        key: extract_region_activity(preds, key, atlas)
+        for key in FRIENDLY_ROIS
     }
 
 
@@ -241,7 +516,8 @@ def whole_brain_stats(preds: np.ndarray) -> dict:
 # Plotting
 # ---------------------------------------------------------------------------
 
-def plot_results(preds: np.ndarray, output_dir: str, title_prefix: str = ""):
+def plot_results(preds: np.ndarray, output_dir: str, title_prefix: str = "",
+                 atlas: dict | None = None):
     """
     Produce a 4-panel plot of TRIBE v2 predictions:
 
@@ -276,7 +552,7 @@ def plot_results(preds: np.ndarray, output_dir: str, title_prefix: str = ""):
     time_axis = np.arange(n_timesteps)
 
     stats     = whole_brain_stats(preds)
-    roi_ts    = roi_timeseries(preds)
+    roi_ts    = roi_timeseries(preds, atlas=atlas)
     left_ts   = preds[:, :10242].mean(axis=1)
     right_ts  = preds[:, 10242:].mean(axis=1)
 
@@ -299,12 +575,17 @@ def plot_results(preds: np.ndarray, output_dir: str, title_prefix: str = ""):
     ax1.axhline(0, color="black", linewidth=0.6, linestyle="--", alpha=0.5)
     ax1.grid(True, alpha=0.3)
 
-    # --- Panel 2: ROI timeseries ---
+    # --- Panel 2: ROI timeseries (Destrieux atlas regions, subset for readability) ---
     ax2 = fig.add_subplot(gs[0, 1])
-    colors = plt.cm.tab10(np.linspace(0, 1, len(roi_ts)))
-    for (roi_name, ts), color in zip(roi_ts.items(), colors):
-        ax2.plot(time_axis, ts, label=roi_name, color=color, linewidth=1.2)
-    ax2.set_title("ROI Timeseries (approximate)", fontweight="bold")
+    # Show a curated subset of the most language-relevant regions
+    display_rois = ["broca", "wernicke", "auditory", "default_mode",
+                    "angular", "middle_temporal"]
+    display_ts   = {k: roi_ts[k] for k in display_rois if k in roi_ts}
+    colors = plt.cm.tab10(np.linspace(0, 1, len(display_ts)))
+    for (roi_name, ts), color in zip(display_ts.items(), colors):
+        label = FRIENDLY_ROIS[roi_name]["description"].split("(")[0].strip()
+        ax2.plot(time_axis, ts, label=label, color=color, linewidth=1.2)
+    ax2.set_title("Key Language/Auditory ROIs (Destrieux atlas)", fontweight="bold")
     ax2.set_xlabel("Time (seconds)")
     ax2.set_ylabel("Mean BOLD (z-score)")
     ax2.axhline(0, color="black", linewidth=0.6, linestyle="--", alpha=0.5)
@@ -501,6 +782,8 @@ Examples:
   python tribe_inference.py --text path/to/text.txt
   python tribe_inference.py --audio path/to/audio.wav
   python tribe_inference.py --prompt "Explain gravity" --output preds.npy
+  python tribe_inference.py --prompt "Speech" --region broca
+  python tribe_inference.py --list_regions
         """,
     )
     parser.add_argument("--prompt", type=str, default=None,
@@ -515,7 +798,19 @@ Examples:
                         help="Directory for plots (default: ./tribe-output)")
     parser.add_argument("--cache",  type=str, default="./tribe-cache",
                         help="Cache folder for model weights (default: ./tribe-cache)")
+    parser.add_argument("--region", type=str, default=None,
+                        help="Print detailed stats for a specific brain region "
+                             "(e.g. --region broca). See --list_regions for all options.")
+    parser.add_argument("--list_regions", action="store_true",
+                        help="List all available named brain regions and exit")
     args = parser.parse_args()
+
+    # --list_regions: print atlas info and exit (no model needed)
+    if args.list_regions:
+        print("Loading Destrieux atlas to count vertices per region...")
+        atlas = load_destrieux_atlas()
+        list_available_regions(atlas)
+        raise SystemExit(0)
 
     # Resolve input
     text_path  = None
@@ -550,7 +845,11 @@ Examples:
     if args.prompt:
         title_prefix = f'"{args.prompt[:60]}{"..." if len(args.prompt) > 60 else ""}"\n'
 
-    # Load and run
+    # Load atlas (used by plot_results and optional --region stats)
+    print("Loading Destrieux brain atlas...")
+    atlas = load_destrieux_atlas()
+
+    # Load TRIBE model and run
     model = load_model(cache_folder=args.cache)
 
     if audio_path:
@@ -567,8 +866,23 @@ Examples:
         np.save(args.output, preds)
         print(f"Predictions saved to {args.output}  shape={preds.shape}")
 
-    # Plot time-series / heatmap panels
-    plot_results(preds, output_dir=args.output_dir, title_prefix=title_prefix)
+    # Optional: print detailed stats for a specific region
+    if args.region:
+        region_key = args.region.lower()
+        try:
+            ts   = extract_region_activity(preds, region_key, atlas)
+            desc = FRIENDLY_ROIS[region_key]["description"]
+            verts = _resolve_vertices(region_key, atlas)
+            print(f"\n--- Region: {desc} ---")
+            print(f"  Vertices   : {len(verts)}")
+            print(f"  Mean BOLD  : {ts.mean():+.4f}")
+            print(f"  Peak BOLD  : {ts.max():+.4f}  (at t={ts.argmax()}s)")
+            print(f"  Timeseries : {np.array2string(ts, precision=3, floatmode='fixed')}")
+        except ValueError as e:
+            print(f"ERROR: {e}")
+
+    # Plot time-series / heatmap panels (uses atlas for accurate ROI labels)
+    plot_results(preds, output_dir=args.output_dir, title_prefix=title_prefix, atlas=atlas)
 
     # Plot mean BOLD on the 3-D cortical surface
     plot_brain_surface(preds, output_dir=args.output_dir, title_prefix=title_prefix)
