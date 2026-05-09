@@ -115,12 +115,16 @@ def _patched_subprocess_run(args, **kwargs):
         args = list(args)
         cmd_str = " ".join(str(a) for a in args)
         if "whisperx" in cmd_str:
-            if "--compute_type" in args:
-                idx = args.index("--compute_type")
-                if idx + 1 < len(args) and args[idx + 1] == "float16":
-                    args[idx + 1] = "int8"
-            else:
-                args = args + ["--compute_type", "int8"]
+            if len(args) >= 2 and args[0] == "uvx" and args[1] == "whisperx":
+                args = ["whisperx"] + args[2:]
+            import torch as _torch
+            if not _torch.cuda.is_available():
+                if "--compute_type" in args:
+                    idx = args.index("--compute_type")
+                    if idx + 1 < len(args) and args[idx + 1] == "float16":
+                        args[idx + 1] = "int8"
+                else:
+                    args = args + ["--compute_type", "int8"]
     return _original_subprocess_run(args, **kwargs)
 
 subprocess.run = _patched_subprocess_run
@@ -131,6 +135,67 @@ subprocess.run = _patched_subprocess_run
 import torch
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForCausalLM
+
+# ---------------------------------------------------------------------------
+# torchvision compatibility shim — must run before peft
+# ---------------------------------------------------------------------------
+# peft.utils.constants imports transformers.BloomPreTrainedModel, which triggers
+# transformers.image_utils: "from torchvision.transforms import InterpolationMode".
+# If torchvision was built against a different torch version (e.g. 0.23.0 installed
+# but torch 2.11.0 running) this crashes with:
+#   RuntimeError: operator torchvision::nms does not exist
+# We never use torchvision directly — stub out the minimum so peft can load.
+# Permanent fix: pip install "torchvision==0.26.0+cu130" \
+#                  --index-url https://download.pytorch.org/whl/cu130
+
+import types as _types
+
+def _patch_torchvision_if_broken() -> None:
+    try:
+        from torchvision.transforms import InterpolationMode as _  # noqa: F401
+        return   # already works — nothing to do
+    except (RuntimeError, ImportError):
+        pass
+    # Clean up the partial module left by the failed import
+    for _k in [k for k in sys.modules if k == "torchvision" or k.startswith("torchvision.")]:
+        del sys.modules[_k]
+    # Minimal stub: only the symbol that peft/transformers import at module load time
+    from enum import Enum
+    class _InterpolationMode(Enum):
+        NEAREST = 0; BILINEAR = 2; BICUBIC = 3; BOX = 4; HAMMING = 5; LANCZOS = 1
+    _tv      = _types.ModuleType("torchvision")
+    _tv_tfms = _types.ModuleType("torchvision.transforms")
+    _tv_tfms.InterpolationMode = _InterpolationMode
+    _tv.transforms = _tv_tfms
+    sys.modules.update({
+        "torchvision":                       _tv,
+        "torchvision.transforms":            _tv_tfms,
+        "torchvision.transforms.functional": _types.ModuleType("torchvision.transforms.functional"),
+        "torchvision._meta_registrations":   _types.ModuleType("torchvision._meta_registrations"),
+        "torchvision.datasets":              _types.ModuleType("torchvision.datasets"),
+        "torchvision.models":                _types.ModuleType("torchvision.models"),
+        "torchvision.ops":                   _types.ModuleType("torchvision.ops"),
+        "torchvision.io":                    _types.ModuleType("torchvision.io"),
+        "torchvision.utils":                 _types.ModuleType("torchvision.utils"),
+    })
+    print(
+        "[brain_optimize] torchvision ABI mismatch with torch 2.11.0 — using stub.\n"
+        "  Permanent fix: pip install 'torchvision==0.26.0+cu130'"
+        " --index-url https://download.pytorch.org/whl/cu130"
+    )
+
+_patch_torchvision_if_broken()
+
+# peft 0.19.1 does "from transformers import BloomPreTrainedModel" in constants.py,
+# but transformers 4.57+ removed it from the public API.  Inject a dummy class so
+# peft can finish importing without pulling in any Bloom weights.
+import transformers as _transformers
+if not hasattr(_transformers, "BloomPreTrainedModel"):
+    import torch.nn as _nn
+    class _BloomStub(_nn.Module):
+        pass
+    _transformers.BloomPreTrainedModel = _BloomStub
+
 from peft import get_peft_model, LoraConfig, TaskType
 
 # Import TRIBE utilities from tribe_inference.py (same directory)
@@ -179,12 +244,17 @@ def load_policy_model(device: str = "cpu") -> tuple:
     tokenizer = AutoTokenizer.from_pretrained(POLICY_MODEL_ID, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "left"   # required for batched generation
 
+    # bfloat16 on CUDA (L40S CC 8.9 has native bf16 support — same exponent range as
+    # float32 so no gradient scaling needed, half the memory, faster matmuls)
+    torch_dtype = torch.bfloat16 if device.startswith("cuda") else torch.float32
     base = AutoModelForCausalLM.from_pretrained(
         POLICY_MODEL_ID,
-        dtype=torch.float32,
-        device_map=device,
+        dtype=torch_dtype,
+        device_map={"": device},    # keep entire model on one GPU for LoRA grad flow
         trust_remote_code=True,
+        attn_implementation="sdpa", # scaled-dot-product attention — faster than eager
     )
     model = get_peft_model(base, LORA_CONFIG)
     model.train()
@@ -204,11 +274,13 @@ def load_reference_model(device: str = "cpu") -> "AutoModelForCausalLM":
     outputs fluent.
     """
     print(f"Loading reference model: {POLICY_MODEL_ID} (frozen)...")
+    torch_dtype = torch.bfloat16 if device.startswith("cuda") else torch.float32
     ref = AutoModelForCausalLM.from_pretrained(
         POLICY_MODEL_ID,
-        dtype=torch.float32,
-        device_map=device,
+        dtype=torch_dtype,
+        device_map={"": device},
         trust_remote_code=True,
+        attn_implementation="sdpa",
     )
     ref.eval()
     for p in ref.parameters():
@@ -366,21 +438,33 @@ def generate_completions(
         prompt_ids = _chat_out.to(device)   # already a tensor
     prompt_len = prompt_ids.shape[1]
 
-    results = []
     model.eval()
     with torch.no_grad():
-        for _ in range(n_completions):
-            output_ids = model.generate(
-                prompt_ids,
-                max_new_tokens=max_new_tokens,
-                do_sample=True,
-                temperature=temperature,
-                pad_token_id=tokenizer.pad_token_id,
-            )
-            completion_ids   = output_ids[0, prompt_len:]
-            completion_text  = tokenizer.decode(completion_ids, skip_special_tokens=True).strip()
-            full_input_ids   = output_ids[:1]   # keep as (1, seq_len)
-            results.append((completion_text, full_input_ids, prompt_len))
+        # Batch all n_completions together — one GPU kernel pass instead of N sequential ones.
+        # Repeat the prompt row n_completions times: (n_completions, prompt_len)
+        batch_prompt     = prompt_ids.expand(n_completions, -1)
+        attention_mask   = torch.ones_like(batch_prompt)
+        output_ids = model.generate(
+            batch_prompt,
+            attention_mask=attention_mask,
+            max_new_tokens=max_new_tokens,
+            do_sample=True,
+            temperature=temperature,
+            pad_token_id=tokenizer.pad_token_id,
+        )
+        # output_ids: (n_completions, prompt_len + max_new_tokens)
+
+    results = []
+    eos_id  = tokenizer.eos_token_id
+    for i in range(n_completions):
+        comp_ids = output_ids[i, prompt_len:]
+        # Trim at first EOS so padding doesn't inflate the loss
+        eos_pos = (comp_ids == eos_id).nonzero(as_tuple=True)[0]
+        if len(eos_pos) > 0:
+            comp_ids = comp_ids[: eos_pos[0].item() + 1]   # keep the EOS token
+        completion_text = tokenizer.decode(comp_ids, skip_special_tokens=True).strip()
+        full_ids = torch.cat([prompt_ids[0], comp_ids]).unsqueeze(0)   # (1, seq_len)
+        results.append((completion_text, full_ids, prompt_len))
 
     model.train()
     return results
@@ -405,8 +489,10 @@ def compute_kl_divergence(
     Returns:
         Scalar KL divergence tensor.
     """
-    log_p = F.log_softmax(policy_logits,    dim=-1)
-    log_q = F.log_softmax(reference_logits, dim=-1)
+    # Cast to float32: log_softmax over a 150k-token vocab is prone to
+    # underflow in bfloat16 (only 7 mantissa bits vs 23 in float32)
+    log_p = F.log_softmax(policy_logits.float(),    dim=-1)
+    log_q = F.log_softmax(reference_logits.float(), dim=-1)
     return F.kl_div(log_q, log_p, reduction="batchmean", log_target=True)
 
 
@@ -468,10 +554,10 @@ def advantage_weighted_loss(
 
     if comp_labels.numel() == 0:
         # Edge case: empty completion — return zero loss
-        return torch.tensor(0.0, requires_grad=True), 0.0
+        return torch.zeros(1, device=full_input_ids.device, requires_grad=True).squeeze(), 0.0
 
-    # CE loss on completion tokens
-    ce_loss = F.cross_entropy(comp_policy_logits, comp_labels)
+    # CE loss: cast to float32 for numerical stability (bfloat16 has limited mantissa)
+    ce_loss = F.cross_entropy(comp_policy_logits.float(), comp_labels)
 
     # KL divergence: policy vs reference on completion tokens
     kl = compute_kl_divergence(comp_policy_logits, comp_ref_logits)
@@ -666,7 +752,15 @@ def optimize(
     print("=" * 70)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"\nDevice: {device}\n")
+    if device == "cuda":
+        # L40S (CC 8.9) supports TF32: full float32 exponent range but faster ALU.
+        # PyTorch 2.x enables this by default; set explicitly to be safe.
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32       = True
+        gpu_name = torch.cuda.get_device_name(0)
+        print(f"\nDevice: {device}  ({gpu_name})\n")
+    else:
+        print(f"\nDevice: {device}\n")
 
     # --- Load models ---
     policy_model, tokenizer = load_policy_model(device=device)
@@ -714,6 +808,14 @@ def optimize(
         rewards     = []
         preds_batch = []
 
+        # Offload Qwen models to CPU while TRIBE runs LLaMA 3.2-3B on GPU.
+        # Both fit on a 48 GB L40S simultaneously, but offloading guarantees
+        # headroom and avoids OOM if the node is shared or under memory pressure.
+        if not mock_tribe and device.startswith("cuda"):
+            policy_model.cpu()
+            ref_model.cpu()
+            torch.cuda.empty_cache()
+
         for i, (text, _, _) in enumerate(completions):
             print(f"  Completion {i+1}: {text[:80]}{'...' if len(text) > 80 else ''}")
 
@@ -731,6 +833,11 @@ def optimize(
             preds_batch.append(p)
             print(f"    reward = {r:.4f}")
 
+        # Move Qwen models back to GPU for the gradient step
+        if not mock_tribe and device.startswith("cuda"):
+            policy_model.to(device)
+            ref_model.to(device)
+
         # Track best completion overall
         for (text, _, _), r, p in zip(completions, rewards, preds_batch):
             if r > best_reward:
@@ -746,21 +853,24 @@ def optimize(
               f"std={np.std(rewards):.4f}  "
               f"min={np.min(rewards):.4f}  max={np.max(rewards):.4f}")
 
-        # 3. Compute per-completion advantages
+        # 3. Compute per-completion advantages (mean-centred and std-normalised)
         mean_reward = np.mean(rewards)
+        std_reward  = np.std(rewards)
         advantages  = [r - mean_reward for r in rewards]
 
         # If all rewards are equal, advantages are all zero — skip gradient step
-        if np.std(rewards) < 1e-8:
+        if std_reward < 1e-8:
             print("  [Warning] All completions have equal reward. "
                   "No gradient update this step.")
             step_losses.append(0.0)
             step_kls.append(0.0)
             continue
 
+        advantages = [a / std_reward for a in advantages]
+
         # 4. Compute advantage-weighted loss and gradient update
         optimizer.zero_grad()
-        total_loss = torch.tensor(0.0)
+        total_loss = torch.zeros(1, device=device).squeeze()   # keep on GPU
         total_kl   = 0.0
 
         for (_, full_ids, comp_start), adv in zip(completions, advantages):

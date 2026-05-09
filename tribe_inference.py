@@ -84,15 +84,20 @@ def _patched_subprocess_run(args, **kwargs):
         args = list(args)
         cmd_str = " ".join(str(a) for a in args)
         if "whisperx" in cmd_str:
-            # tribev2 hardcodes compute_type="float16" regardless of device.
-            # float16 crashes on Mac/CPU with ctranslate2. Replace with int8,
-            # which is fully supported on CPU.
-            if "--compute_type" in args:
-                idx = args.index("--compute_type")
-                if idx + 1 < len(args) and args[idx + 1] == "float16":
-                    args[idx + 1] = "int8"
-            else:
-                args = args + ["--compute_type", "int8"]
+            # tribev2 invokes whisperx via `uvx whisperx ...` but uvx may not
+            # be installed. Replace with the direct `whisperx` CLI command.
+            if len(args) >= 2 and args[0] == "uvx" and args[1] == "whisperx":
+                args = ["whisperx"] + args[2:]
+            # float16 is unsupported on CPU with ctranslate2; use int8 instead.
+            # On CUDA, float16 is fine — leave it as-is.
+            import torch as _torch
+            if not _torch.cuda.is_available():
+                if "--compute_type" in args:
+                    idx = args.index("--compute_type")
+                    if idx + 1 < len(args) and args[idx + 1] == "float16":
+                        args[idx + 1] = "int8"
+                else:
+                    args = args + ["--compute_type", "int8"]
     return _original_subprocess_run(args, **kwargs)
 
 subprocess.run = _patched_subprocess_run
@@ -127,9 +132,11 @@ def load_model(cache_folder: str = "./tribe-cache"):
     import torch
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # config.yaml hardcodes device: cuda for the main feature extractors.
-    # Only the top-level device fields can be safely overridden via config_update;
-    # the nested image sub-configs use strict pydantic and reject extra fields.
+    print(device)
+    # config.yaml targets Meta's internal cluster (partition: scavenge,
+    # constraint: volta32gb, folder: /checkpoint/sdascoli/...).
+    # The nested infra paths are too deep for config_update to reach reliably,
+    # so we load the model first then patch the infra objects directly after.
     config_update = {
         "data.text_feature.device":  device,
         "data.audio_feature.device": device,
@@ -143,6 +150,28 @@ def load_model(cache_folder: str = "./tribe-cache"):
         device=device,
         config_update=config_update,
     )
+
+    # Patch the feature-extractor infra objects directly after loading.
+    # config_update can't reliably reach these deeply nested pydantic fields.
+    # Setting cluster=None forces in-process execution on the current GPU node
+    # instead of submitting SLURM sub-jobs to Meta's internal cluster config
+    # (partition: scavenge, constraint: volta32gb) which doesn't exist here.
+    _local_cache = str(Path(cache_folder).resolve())
+    for _extractor_name in ("text_feature", "audio_feature"):
+        try:
+            _extractor = getattr(model.data_config, _extractor_name, None)
+            if _extractor is None:
+                # try alternate attribute path used in some tribev2 versions
+                _extractor = getattr(model.config.data, _extractor_name, None)
+            if _extractor is not None and hasattr(_extractor, "infra"):
+                _infra = _extractor.infra
+                _infra.cluster           = None   # run in-process, no SLURM sub-job
+                _infra.folder            = _local_cache
+                _infra.slurm_partition   = None
+                _infra.slurm_constraint  = None
+        except Exception:
+            pass   # if the attribute path changed in a future version, skip silently
+
     print("Model ready.\n")
     return model
 

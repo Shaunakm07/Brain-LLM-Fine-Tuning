@@ -111,6 +111,8 @@ Effect on gradients:
 
 This works even when the judge only uses a narrow score range, because what matters is the **relative difference** within the group, not the absolute values.
 
+**Important:** `brain_optimize.py` divides advantages by the reward std at each step (after mean-centering). This decouples the gradient update magnitude from reward variance — a noisy step with large reward spread produces the same-scale gradient as a clean step with tight reward spread. Without this, high-variance steps dominate training and the reward curve shows excessive fluctuation.
+
 ---
 
 ## Why Loss Increases Over Time — and the KL Penalty Fix
