@@ -165,7 +165,7 @@ with warnings.catch_warnings():
 # Configuration
 # ---------------------------------------------------------------------------
 
-POLICY_MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
+POLICY_MODEL_ID = "Qwen/Qwen2.5-3B-Instruct"
 CKPT_EVERY      = 10   # save checkpoint every N steps
 
 # Wider LoRA: r=16, all attention + FFN projections
@@ -884,6 +884,8 @@ Examples:
                             "revealed something surprising about the nature of the mind."
                         ),
                         help="User prompt for the policy model")
+    parser.add_argument("--model",        type=str,  default=POLICY_MODEL_ID,
+                        help="HuggingFace model ID for the policy (and reference) model")
     parser.add_argument("--region",       type=str,  default="broca")
     parser.add_argument("--minimize",     action="store_true")
     parser.add_argument("--n_steps",      type=int,  default=200,
@@ -904,6 +906,7 @@ Examples:
                         help="Resume from latest checkpoint in output_dir")
     parser.add_argument("--list_regions", action="store_true")
     args = parser.parse_args()
+    POLICY_MODEL_ID = args.model
 
     if args.list_regions:
         print("Loading Destrieux atlas...")
