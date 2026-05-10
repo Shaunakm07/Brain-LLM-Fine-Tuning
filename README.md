@@ -460,6 +460,41 @@ Any causal LM on HuggingFace works. Recommended for local use:
 
 ---
 
+## Experiment log
+
+### ✅ L40S baseline — 200 steps, full TRIBE (May 2026)
+
+Trained `Qwen/Qwen2.5-3B-Instruct` with LoRA (r=32) on full-pipeline TRIBE rewards (gTTS → WhisperX → LLaMA 3.2-3B + Wav2Vec-BERT → BOLD) targeting Broca's area. 200 steps, 4 completions/step, lr=5e-5. Results in `EXPERIMENT.md`.
+
+| Metric | Result |
+|--------|--------|
+| Broca Δ | +0.167 |
+| Wernicke Δ | +0.218 (largest gain despite not being the target) |
+| Global BOLD | +0.023 → +0.104 (×4.6) |
+| KL at step 200 | 0.280 (safe, significant headroom remaining) |
+
+---
+
+### ❌ Text-only TRIBE speedup attempt — failed (May 2026)
+
+**Hypothesis:** Skipping gTTS + WhisperX + Wav2Vec-BERT and using only LLaMA text features as the TRIBE reward would give ~5× faster steps, allowing more training in the same wall time.
+
+**What was tried:**
+- Built a `batch_score_text_only()` function that bypasses the audio pipeline entirely — word timing estimated from text at a fixed speaking rate, all completions batched into a single TRIBE forward pass
+- TRIBE's `aggregate_features` zero-fills the missing Wav2Vec-BERT modality (supported by its modality-dropout training)
+- Three runs attempted: lr=5e-5 (KL barely moved after 80 steps), lr=2e-4 (KL oscillated, rewards declined after step 87), and a cancelled mid-run
+
+**Why it failed:**
+1. **Different reward surface.** Without acoustic features, the text-only reward has a baseline near 0.0 vs ~0.085 for the full pipeline. Many completions score negative — the gradient is noisier and less directional.
+2. **LR sensitivity.** The noisier reward surface required a higher LR to move the weights, but a higher LR (2e-4) caused KL oscillation against the penalty rather than steady drift. The model never found a stable basin.
+3. **No transfer guarantee.** The final comparison uses full TRIBE regardless of how training was done. Text patterns that score well under text-only TRIBE may not transfer to higher full-TRIBE Broca activation.
+
+**Lesson:** The full gTTS + WhisperX + Wav2Vec-BERT pipeline is load-bearing for this reward signal. The ~60s/completion cost of WhisperX is the price of a clean, positive reward baseline. Attempts to shortcut it degrade training stability more than the speed gain is worth.
+
+**Logs:** `brain_textonly_fresh_1552508.log`, `brain_textonly_fresh_1552532.log`
+
+---
+
 ## Documentation
 
 | Document | Contents |
