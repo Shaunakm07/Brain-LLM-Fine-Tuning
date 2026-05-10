@@ -14,20 +14,20 @@ echo "=== Job started at $(date) ==="
 echo "=== Node: $(hostname) ==="
 echo "=== GPU: $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader) ==="
 echo "=== RAM: $(free -h | awk '/Mem/{print $2}') total ==="
-echo ""
 
 python brain_optimize_l40s.py \
     --region broca \
+    --model Qwen/Qwen2.5-3B-Instruct \
     --n_steps 200 \
-    --n_completions 8 \
-    --max_new_tokens 120 \
+    --n_completions 4 \
+    --max_new_tokens 200 \
     --t_start 1.0 \
     --t_end 0.6 \
-    --kl_coef 0.5 \
+    --kl_coef 0.1 \
     --lr 5e-5 \
     --warmup_steps 5 \
     --output_dir ./brain-optimize-output-l40s \
-    --cache ./tribe-cache
+    --cache /tmp/tribe-cache-${SLURM_JOB_ID}
 
 echo ""
 echo "=== Job completed at $(date) ==="
