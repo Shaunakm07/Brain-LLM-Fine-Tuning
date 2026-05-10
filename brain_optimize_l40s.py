@@ -725,17 +725,23 @@ def optimize(
               f"std={np.std(rewards):.4f}  "
               f"min={np.min(rewards):.4f}  max={np.max(rewards):.4f}")
 
-        # 3. Advantages
+        # 3. Whitened advantages: (r - mean) / std
+        # Whitening keeps the gradient magnitude constant regardless of how
+        # tight the reward distribution is. Without it, as the model converges
+        # to a narrow mode the advantage shrinks to near zero and the KL
+        # penalty dominates, pulling the weights back toward base.
         mean_reward = np.mean(rewards)
-        advantages  = [r - mean_reward for r in rewards]
+        std_reward  = np.std(rewards)
 
-        if np.std(rewards) < 1e-8:
+        if std_reward < 1e-8:
             print("  [Warning] All rewards equal — skipping gradient update.")
             step_losses.append(0.0)
             step_kls.append(0.0)
             scheduler.step()
             step += 1
             continue
+
+        advantages = [(r - mean_reward) / std_reward for r in rewards]
 
         # 4. Advantage-weighted loss + gradient step
         optimizer.zero_grad()
