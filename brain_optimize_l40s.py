@@ -650,10 +650,11 @@ def optimize(
     )
 
     if resume and resume_ckpt_dir is not None:
-        sched_path = os.path.join(resume_ckpt_dir, "scheduler.pt")
-        if os.path.exists(sched_path):
-            scheduler.load_state_dict(torch.load(sched_path, map_location="cpu"))
-        # Fast-forward scheduler to match start_step
+        # Do NOT load scheduler state: the saved state contains the old T_max
+        # (from the original n_steps), and loading it then fast-forwarding
+        # cycles the cosine schedule to a random position. Instead, fast-forward
+        # the freshly-built scheduler (which has the correct T_max for the new
+        # n_steps) to match start_step.
         for _ in range(start_step - 1):
             scheduler.step()
 
