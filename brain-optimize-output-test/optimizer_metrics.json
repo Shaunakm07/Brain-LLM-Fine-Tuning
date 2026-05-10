@@ -1,0 +1,32 @@
+{
+  "roi_key": "broca",
+  "roi_description": "Broca's area (IFG pars opercularis + triangularis, left)",
+  "maximize": true,
+  "mock_tribe": true,
+  "n_steps": 2,
+  "n_completions": 2,
+  "best_reward": 1.3375319899051958,
+  "best_completion": "Language and the human brain are fascinating interconnected systems. The brain's neural networks allow for complex communication across vast distances, but it's also capable of recognizing patterns within seemingly unrelated words or phrases. For instance, understanding \"sunrise\" in English can be as challenging as deciphering ancient Egyptian hieroglyphs. This recognition is not just about memorizing vocabulary but also involves comprehending contextual cues that translate",
+  "step_rewards": [
+    [
+      -1.0175831580371915,
+      0.4434258497700276
+    ],
+    [
+      1.3375319899051958,
+      0.6400233291968328
+    ]
+  ],
+  "best_rewards": [
+    0.4434258497700276,
+    1.3375319899051958
+  ],
+  "step_losses": [
+    -0.007628113031387329,
+    0.0681551992893219
+  ],
+  "step_kls": [
+    0.0,
+    0.0012632019934244454
+  ]
+}

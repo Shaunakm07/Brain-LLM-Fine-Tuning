@@ -1,0 +1,18 @@
+Prompt:  Tell a rich, detailed story about a moment when language revealed something surprising about the nature of the mind.
+Region:  Broca's area (IFG pars opercularis + triangularis, left)
+Goal:    maximise
+Reward:  0.295533
+Mock:    False
+
+Best completion:
+Amidst the lush emerald grove of the old arboretum, where the trees stood in silent conversation, an epiphany blossomed within the mind of a scholar and a student. The scholar, an ardent linguist, was teaching the student, a young philosopher, the intricacies of semantic ambiguity.
+
+The scholar posed a question: "What does it mean to say 'the quick brown fox jumps over the lazy dog'?"
+
+The student, intrigued by the challenge, replied confidently, "It means a quick brown fox leaps over a lazy dog."
+
+The scholar nodded approvingly but then asked, "But what if we change the order slightly? How would you interpret 'the lazy dog jumps over the quick brown fox'?"
+
+The student paused, perplexed. "I suppose it still means the same thing, just rearranged," he said hesitantly.
+
+The scholar smiled knowingly and said, "Exactly. The sentence's meaning doesn't change because it contains no essential information;

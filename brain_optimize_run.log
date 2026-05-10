@@ -1,0 +1,44 @@
+======================================================================
+Brain Optimizer
+  Target region  : Broca's area (IFG pars opercularis + triangularis, left)
+  Direction      : maximise
+  Steps          : 10  ×  4 completions
+  Max tokens     : 80
+  Mock TRIBE     : False
+  Output dir     : ./brain-optimize-output
+======================================================================
+
+Device: cuda  (NVIDIA L40S)
+
+Loading policy model: Qwen/Qwen2.5-0.5B-Instruct...
+  Trainable parameters: 540,672 / 494,573,440  (0.11%)
+Loading reference model: Qwen/Qwen2.5-0.5B-Instruct (frozen)...
+[fetch_atlas_surf_destrieux] Dataset found in 
+/home/users/shaunakm/nilearn_data/destrieux_surface
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/extractors/base.py:707: UserWarning: LabelEncoder: event_types has not been set, are you sure you want to apply this extractor to all events?
+  warnings.warn(
+2026-05-09 05:41:32 - WARNING - neuralset.extractors.base:798 - Missing events will be encoded using the default all-zero value (for example, 0 or a zero vector/tensor), which may be indistinguishable from a valid class if that class is also mapped to zeros. Set treat_missing_as_separate_class=True to avoid this.
+2026-05-09 05:41:32 - WARNING - neuralset.extractors.base:798 - Missing events will be encoded using the default all-zero value (for example, 0 or a zero vector/tensor), which may be indistinguishable from a valid class if that class is also mapped to zeros. Set treat_missing_as_separate_class=True to avoid this.
+INFO - Loading model from /home/users/shaunakm/.cache/huggingface/hub/models--facebook--tribev2/snapshots/f894e783020944dcd96e5568550afe2aa9743f9f/best.ckpt
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/x_transformers/x_transformers.py:439: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @autocast(enabled = False)
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/x_transformers/x_transformers.py:461: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @autocast(enabled = False)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-its-not-just-a-system-of-sounds,-but-an-intricate-network-of-nerve-cells-in-our-brains-that...11-27be2263/audio.mp3
+
+Loading TRIBE v2 (this may take a few minutes on first run)...
+cuda
+Loading TRIBE v2 from facebook/tribev2 (device: cuda)...
+  (First run downloads ~710 MB checkpoint — this may take a few minutes)
+Model ready.
+
+
+Prompt: 'Describe something interesting about language and the brain.'
+
+----------------------------------------------------------------------
+
+[Step 1/10]
+  Completion 1: Language is fascinating because it's not just a system of sounds, but an intrica...
+Processing text: /tmp/tmp4vkqplmt.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]

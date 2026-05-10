@@ -1,0 +1,8 @@
+Prompt:  Describe something interesting about language and the brain.
+Region:  Broca's area (IFG pars opercularis + triangularis, left)
+Goal:    maximise
+Reward:  1.337532
+Mock:    True
+
+Best completion:
+Language and the human brain are fascinating interconnected systems. The brain's neural networks allow for complex communication across vast distances, but it's also capable of recognizing patterns within seemingly unrelated words or phrases. For instance, understanding "sunrise" in English can be as challenging as deciphering ancient Egyptian hieroglyphs. This recognition is not just about memorizing vocabulary but also involves comprehending contextual cues that translate

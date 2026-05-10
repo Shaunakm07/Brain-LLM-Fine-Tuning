@@ -1,0 +1,8 @@
+Prompt:  Describe something interesting about language and the brain.
+Region:  Broca's area (IFG pars opercularis + triangularis, left)
+Goal:    maximise
+Reward:  0.135070
+Mock:    False
+
+Best completion:
+One fascinating aspect of how our minds process information is that the human brain can generate new words through both conscious and unconscious processes. This ability to create or invent words (synesthesia) allows us to perceive sounds in unusual ways. For example, a person might hear their own name as "cat" when they speak it aloud, which isn't always immediately obvious but suggests they have developed this skill. Additionally

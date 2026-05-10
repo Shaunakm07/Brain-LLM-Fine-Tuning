@@ -1,0 +1,1833 @@
+=== Job started at Sat May  9 05:49:52 PDT 2026 ===
+=== Node: oat-01 ===
+=== GPU: NVIDIA L40S, 46068 MiB ===
+=== RAM: 251Gi total ===
+
+======================================================================
+Brain Optimizer
+  Target region  : Broca's area (IFG pars opercularis + triangularis, left)
+  Direction      : maximise
+  Steps          : 10  ×  4 completions
+  Max tokens     : 80
+  Mock TRIBE     : False
+  Output dir     : ./brain-optimize-output
+======================================================================
+
+Device: cuda  (NVIDIA L40S)
+
+Loading policy model: Qwen/Qwen2.5-0.5B-Instruct...
+  Trainable parameters: 540,672 / 494,573,440  (0.11%)
+Loading reference model: Qwen/Qwen2.5-0.5B-Instruct (frozen)...
+[fetch_atlas_surf_destrieux] Dataset found in 
+/home/users/shaunakm/nilearn_data/destrieux_surface
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/extractors/base.py:707: UserWarning: LabelEncoder: event_types has not been set, are you sure you want to apply this extractor to all events?
+  warnings.warn(
+2026-05-09 05:50:58 - WARNING - neuralset.extractors.base:798 - Missing events will be encoded using the default all-zero value (for example, 0 or a zero vector/tensor), which may be indistinguishable from a valid class if that class is also mapped to zeros. Set treat_missing_as_separate_class=True to avoid this.
+2026-05-09 05:50:59 - WARNING - neuralset.extractors.base:798 - Missing events will be encoded using the default all-zero value (for example, 0 or a zero vector/tensor), which may be indistinguishable from a valid class if that class is also mapped to zeros. Set treat_missing_as_separate_class=True to avoid this.
+INFO - Loading model from /home/users/shaunakm/.cache/huggingface/hub/models--facebook--tribev2/snapshots/f894e783020944dcd96e5568550afe2aa9743f9f/best.ckpt
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/x_transformers/x_transformers.py:439: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @autocast(enabled = False)
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/x_transformers/x_transformers.py:461: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  @autocast(enabled = False)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-incredibly-complex,-not-only-because-its-a-human-invention-but-also-due-to-its-profound-influence-on-our-cognit...11-8e69e9e2/audio.mp3
+
+Loading TRIBE v2 (this may take a few minutes on first run)...
+cuda
+Loading TRIBE v2 from facebook/tribev2 (device: cuda)...
+  (First run downloads ~710 MB checkpoint — this may take a few minutes)
+Model ready.
+
+
+Prompt: 'Describe something interesting about language and the brain.'
+
+----------------------------------------------------------------------
+
+[Step 1/10]
+  Completion 1: Language is incredibly complex, not only because it's a human invention but also...
+Processing text: /tmp/tmp3gl1fpwv.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:50<00:00, 50.63s/it]Extracting words from audio: 100%|██████████| 1/1 [00:50<00:00, 50.63s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/73 [00:00<?, ?it/s]Add context to words: 100%|██████████| 73/73 [00:00<00:00, 93835.18it/s]
+[05:52:01 WARNING] Removing extractor video as there are no corresponding events
+[05:52:01 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (77 events)...
+  0%|          | 0/71 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/18 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:08<00:08,  8.45s/it][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:11<00:00,  5.45s/it][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:11<00:00,  5.90s/it]
+  1%|▏         | 1/71 [00:14<17:11, 14.74s/it]
+Computing word embeddings:   6%|▌         | 1/18 [00:14<04:10, 14.75s/it][A 13%|█▎        | 9/71 [00:14<01:14,  1.20s/it]
+Computing word embeddings:  17%|█▋        | 3/18 [00:14<00:58,  3.88s/it][A 20%|█▉        | 14/71 [00:15<00:38,  1.49it/s]
+Computing word embeddings:  28%|██▊       | 5/18 [00:15<00:25,  1.93s/it][A 30%|██▉       | 21/71 [00:15<00:18,  2.75it/s] 39%|███▉      | 28/71 [00:15<00:09,  4.50it/s]
+Computing word embeddings:  39%|███▉      | 7/18 [00:15<00:12,  1.15s/it][A 48%|████▊     | 34/71 [00:15<00:05,  6.39it/s]
+Computing word embeddings:  50%|█████     | 9/18 [00:15<00:06,  1.34it/s][A 58%|█████▊    | 41/71 [00:15<00:03,  9.09it/s]
+Computing word embeddings:  61%|██████    | 11/18 [00:15<00:03,  1.94it/s][A 69%|██████▉   | 49/71 [00:15<00:01, 13.05it/s]
+Computing word embeddings:  72%|███████▏  | 13/18 [00:15<00:01,  2.71it/s][A 79%|███████▉  | 56/71 [00:15<00:00, 17.54it/s]
+Computing word embeddings:  83%|████████▎ | 15/18 [00:15<00:00,  3.59it/s][A 87%|████████▋ | 62/71 [00:16<00:00, 20.27it/s]
+Computing word embeddings:  94%|█████████▍| 17/18 [00:16<00:00,  4.67it/s][A 97%|█████████▋| 69/71 [00:16<00:00, 25.58it/s]100%|██████████| 71/71 [00:16<00:00,  4.40it/s]
+Computing word embeddings: 100%|██████████| 18/18 [00:16<00:00,  1.12it/s]
+[05:52:18 INFO] Preparing extractor: audio
+[05:52:24 INFO] Preparing extractor: subject_id
+2026-05-09 05:52:24 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:52:24 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]100%|██████████| 1/1 [00:01<00:00,  1.55s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-language-is-its-ability-to-encode-complex-thoughts-and-ideas-in-an-accessible-manner-that-can-be-...11-655c2cae/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0135
+  Completion 2: One fascinating aspect of language is its ability to encode complex thoughts and...
+Processing text: /tmp/tmpi3i2_7mz.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.21s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.21s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 95355.61it/s]
+[05:52:42 WARNING] Removing extractor video as there are no corresponding events
+[05:52:42 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (78 events)...
+  0%|          | 0/71 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/18 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.96it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.17it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.90it/s]
+  1%|▏         | 1/71 [00:03<04:10,  3.58s/it]
+Computing word embeddings:   6%|▌         | 1/18 [00:03<01:01,  3.59s/it][A 13%|█▎        | 9/71 [00:03<00:18,  3.29it/s]
+Computing word embeddings:  17%|█▋        | 3/18 [00:03<00:14,  1.02it/s][A 30%|██▉       | 21/71 [00:03<00:05,  8.95it/s]
+Computing word embeddings:  33%|███▎      | 6/18 [00:03<00:04,  2.41it/s][A 41%|████      | 29/71 [00:04<00:03, 13.26it/s]
+Computing word embeddings:  44%|████▍     | 8/18 [00:04<00:02,  3.47it/s][A 52%|█████▏    | 37/71 [00:04<00:01, 18.23it/s]
+Computing word embeddings:  56%|█████▌    | 10/18 [00:04<00:01,  4.70it/s][A 63%|██████▎   | 45/71 [00:04<00:01, 23.13it/s]
+Computing word embeddings:  67%|██████▋   | 12/18 [00:04<00:01,  5.90it/s][A 75%|███████▍  | 53/71 [00:04<00:00, 27.32it/s]
+Computing word embeddings:  78%|███████▊  | 14/18 [00:04<00:00,  6.92it/s][A 86%|████████▌ | 61/71 [00:04<00:00, 32.29it/s]
+Computing word embeddings:  89%|████████▉ | 16/18 [00:04<00:00,  8.16it/s][A 97%|█████████▋| 69/71 [00:04<00:00, 37.86it/s]100%|██████████| 71/71 [00:04<00:00, 14.78it/s]
+
+Computing word embeddings: 100%|██████████| 18/18 [00:04<00:00,  9.55it/s][AComputing word embeddings: 100%|██████████| 18/18 [00:04<00:00,  3.74it/s]
+[05:52:48 INFO] Preparing extractor: audio
+[05:52:49 INFO] Preparing extractor: subject_id
+2026-05-09 05:52:49 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:52:49 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.43s/it]100%|██████████| 1/1 [00:01<00:00,  1.58s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-an-incredibly-fascinating-aspect-of-our-cognitive-abilities,-with-profound-implications-for-how-we-communicate,...11-c77d6d06/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0646
+  Completion 3: Language is an incredibly fascinating aspect of our cognitive abilities, with pr...
+Processing text: /tmp/tmphetmqczo.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.81s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.81s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 97575.32it/s]
+[05:53:08 WARNING] Removing extractor video as there are no corresponding events
+[05:53:08 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/66 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.98it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.22it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.94it/s]
+  2%|▏         | 1/66 [00:03<03:54,  3.61s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:57,  3.61s/it][A 14%|█▎        | 9/66 [00:03<00:17,  3.28it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:13,  1.02it/s][A 26%|██▌       | 17/66 [00:03<00:06,  7.19it/s]
+Computing word embeddings:  35%|███▌      | 6/17 [00:03<00:04,  2.42it/s][A 38%|███▊      | 25/66 [00:03<00:03, 11.98it/s]
+Computing word embeddings:  47%|████▋     | 8/17 [00:04<00:02,  3.55it/s][A 50%|█████     | 33/66 [00:04<00:01, 17.66it/s]
+Computing word embeddings:  59%|█████▉    | 10/17 [00:04<00:01,  4.83it/s][A 62%|██████▏   | 41/66 [00:04<00:01, 23.74it/s]
+Computing word embeddings:  71%|███████   | 12/17 [00:04<00:00,  6.24it/s][A 74%|███████▍  | 49/66 [00:04<00:00, 30.19it/s]
+Computing word embeddings:  82%|████████▏ | 14/17 [00:04<00:00,  7.77it/s][A 86%|████████▋ | 57/66 [00:04<00:00, 36.87it/s]
+Computing word embeddings:  94%|█████████▍| 16/17 [00:04<00:00,  9.43it/s][A 98%|█████████▊| 65/66 [00:04<00:00, 44.49it/s]100%|██████████| 66/66 [00:04<00:00, 14.52it/s]
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  3.74it/s]
+[05:53:13 INFO] Preparing extractor: audio
+[05:53:14 INFO] Preparing extractor: subject_id
+2026-05-09 05:53:14 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:53:14 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.41s/it]100%|██████████| 1/1 [00:01<00:00,  1.57s/it]
+INFO - Predicted 32 / 100 segments (32.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-and-the-human-brain-have-an-intriguing-connection.-Our-ability-to-communicate-effectively-is-intricately-linked-wi...11-3aff0a6e/audio.mp3
+  Step 3/3: Done. Output shape: (32, 20484)
+            32 timesteps × 20484 cortical vertices
+
+    reward = 0.0043
+  Completion 4: Language and the human brain have an intriguing connection. Our ability to commu...
+Processing text: /tmp/tmpuo0gas1c.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.52s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.52s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 95325.09it/s]
+[05:53:33 WARNING] Removing extractor video as there are no corresponding events
+[05:53:33 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (78 events)...
+  0%|          | 0/70 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/18 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.94it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.18it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.90it/s]
+  1%|▏         | 1/70 [00:03<03:59,  3.47s/it]
+Computing word embeddings:   6%|▌         | 1/18 [00:03<00:59,  3.48s/it][A 13%|█▎        | 9/70 [00:03<00:17,  3.42it/s]
+Computing word embeddings:  17%|█▋        | 3/18 [00:03<00:14,  1.06it/s][A 24%|██▍       | 17/70 [00:03<00:07,  7.48it/s]
+Computing word embeddings:  28%|██▊       | 5/18 [00:03<00:06,  2.06it/s][A 36%|███▌      | 25/70 [00:03<00:03, 12.56it/s]
+Computing word embeddings:  39%|███▉      | 7/18 [00:03<00:03,  3.32it/s][A 47%|████▋     | 33/70 [00:03<00:02, 18.35it/s]
+Computing word embeddings:  50%|█████     | 9/18 [00:03<00:01,  4.74it/s][A 59%|█████▊    | 41/70 [00:04<00:01, 24.46it/s]
+Computing word embeddings:  61%|██████    | 11/18 [00:04<00:01,  6.24it/s][A 70%|███████   | 49/70 [00:04<00:00, 31.51it/s]
+Computing word embeddings:  72%|███████▏  | 13/18 [00:04<00:00,  8.03it/s][A 81%|████████▏ | 57/70 [00:04<00:00, 38.29it/s]
+Computing word embeddings:  83%|████████▎ | 15/18 [00:04<00:00,  9.68it/s][A 93%|█████████▎| 65/70 [00:04<00:00, 44.68it/s]
+Computing word embeddings:  94%|█████████▍| 17/18 [00:04<00:00, 11.25it/s][A100%|██████████| 70/70 [00:04<00:00, 15.78it/s]
+Computing word embeddings: 100%|██████████| 18/18 [00:04<00:00,  4.06it/s]
+[05:53:38 INFO] Preparing extractor: audio
+[05:53:40 INFO] Preparing extractor: subject_id
+2026-05-09 05:53:40 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:53:40 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.41s/it]100%|██████████| 1/1 [00:01<00:00,  1.55s/it]
+INFO - Predicted 33 / 100 segments (33.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-not-only-allows-us-to-communicate-but-also-shapes-our-understanding-of-the-world-around-...11-0c74ae21/audio.mp3
+  Step 3/3: Done. Output shape: (33, 20484)
+            33 timesteps × 20484 cortical vertices
+
+    reward = 0.0528
+  *** New best reward: 0.0135 ***
+  *** New best reward: 0.0646 ***
+  Step rewards: mean=0.0338  std=0.0254  min=0.0043  max=0.0646
+  loss=0.0017  KL=0.0000
+
+[Step 2/10]
+  Completion 1: Language is fascinating because it not only allows us to communicate but also sh...
+Processing text: /tmp/tmpnbzlcmqw.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.83s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.83s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 99430.91it/s]
+[05:54:01 WARNING] Removing extractor video as there are no corresponding events
+[05:54:01 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (77 events)...
+  0%|          | 0/66 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.92it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.16it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.88it/s]
+  2%|▏         | 1/66 [00:03<03:55,  3.62s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:58,  3.63s/it][A 14%|█▎        | 9/66 [00:03<00:17,  3.28it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:13,  1.02it/s][A 26%|██▌       | 17/66 [00:03<00:06,  7.17it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:06,  1.97it/s][A 38%|███▊      | 25/66 [00:03<00:03, 11.92it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:03,  3.15it/s][A 50%|█████     | 33/66 [00:04<00:01, 17.60it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:04<00:01,  4.55it/s][A 62%|██████▏   | 41/66 [00:04<00:01, 23.97it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:04<00:00,  6.12it/s][A 74%|███████▍  | 49/66 [00:04<00:00, 31.35it/s]
+Computing word embeddings:  82%|████████▏ | 14/17 [00:04<00:00,  8.64it/s][A 86%|████████▋ | 57/66 [00:04<00:00, 37.83it/s]
+Computing word embeddings:  94%|█████████▍| 16/17 [00:04<00:00,  9.80it/s][A 98%|█████████▊| 65/66 [00:04<00:00, 43.71it/s]100%|██████████| 66/66 [00:04<00:00, 14.51it/s]
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  3.73it/s]
+[05:54:06 INFO] Preparing extractor: audio
+[05:54:08 INFO] Preparing extractor: subject_id
+2026-05-09 05:54:08 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:54:08 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.72s/it]100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-an-incredibly-fascinating-aspect-of-our-human-experience.-Its-not-just-communication-its-also-a-complex-system-...11-b051d144/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0318
+  Completion 2: Language is an incredibly fascinating aspect of our human experience. It's not j...
+Processing text: /tmp/tmpnhb696nf.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.55s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.55s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/67 [00:00<?, ?it/s]Add context to words: 100%|██████████| 67/67 [00:00<00:00, 102188.50it/s]
+[05:54:26 WARNING] Removing extractor video as there are no corresponding events
+[05:54:26 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (75 events)...
+  0%|          | 0/59 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/15 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.92it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.20it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.91it/s]
+  2%|▏         | 1/59 [00:03<03:24,  3.53s/it]
+Computing word embeddings:   7%|▋         | 1/15 [00:03<00:49,  3.54s/it][A 15%|█▌        | 9/59 [00:03<00:14,  3.36it/s]
+Computing word embeddings:  20%|██        | 3/15 [00:03<00:11,  1.04it/s][A 29%|██▉       | 17/59 [00:03<00:05,  7.30it/s]
+Computing word embeddings:  33%|███▎      | 5/15 [00:03<00:04,  2.01it/s][A 42%|████▏     | 25/59 [00:03<00:02, 12.13it/s]
+Computing word embeddings:  47%|████▋     | 7/15 [00:03<00:02,  3.20it/s][A 56%|█████▌    | 33/59 [00:04<00:01, 17.81it/s]
+Computing word embeddings:  60%|██████    | 9/15 [00:04<00:01,  4.60it/s][A 69%|██████▉   | 41/59 [00:04<00:00, 24.09it/s]
+Computing word embeddings:  73%|███████▎  | 11/15 [00:04<00:00,  6.15it/s][A 83%|████████▎ | 49/59 [00:04<00:00, 30.44it/s]
+Computing word embeddings:  87%|████████▋ | 13/15 [00:04<00:00,  7.71it/s][A 97%|█████████▋| 57/59 [00:04<00:00, 36.87it/s]100%|██████████| 59/59 [00:04<00:00, 13.46it/s]
+
+Computing word embeddings: 100%|██████████| 15/15 [00:04<00:00,  9.34it/s][AComputing word embeddings: 100%|██████████| 15/15 [00:04<00:00,  3.42it/s]
+[05:54:31 INFO] Preparing extractor: audio
+[05:54:32 INFO] Preparing extractor: subject_id
+2026-05-09 05:54:32 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:54:33 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.73s/it]100%|██████████| 1/1 [00:01<00:00,  1.91s/it]
+INFO - Predicted 33 / 100 segments (33.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-a-remarkable-ability-that-connects-human-beings-across-cultures-and-time-periods-through-the-exchange-of-sounds...11-115f20be/audio.mp3
+  Step 3/3: Done. Output shape: (33, 20484)
+            33 timesteps × 20484 cortical vertices
+
+    reward = 0.0059
+  Completion 3: Language is a remarkable ability that connects human beings across cultures and ...
+Processing text: /tmp/tmpwnbmnxha.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.17s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.17s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 97709.03it/s]
+[05:54:50 WARNING] Removing extractor video as there are no corresponding events
+[05:54:50 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/65 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.94it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.23it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.94it/s]
+  2%|▏         | 1/65 [00:03<03:52,  3.64s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:58,  3.65s/it][A 14%|█▍        | 9/65 [00:03<00:17,  3.27it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:13,  1.01it/s][A 26%|██▌       | 17/65 [00:03<00:06,  7.13it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:06,  1.96it/s][A 38%|███▊      | 25/65 [00:03<00:03, 12.04it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:03,  3.18it/s][A 51%|█████     | 33/65 [00:04<00:01, 17.77it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:04<00:01,  4.59it/s][A 63%|██████▎   | 41/65 [00:04<00:00, 24.23it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:04<00:00,  6.18it/s][A 75%|███████▌  | 49/65 [00:04<00:00, 30.83it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:04<00:00,  7.82it/s][A 88%|████████▊ | 57/65 [00:04<00:00, 37.94it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:04<00:00,  9.58it/s][A100%|██████████| 65/65 [00:04<00:00, 45.38it/s]100%|██████████| 65/65 [00:04<00:00, 14.35it/s]
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  3.75it/s]
+[05:54:55 INFO] Preparing extractor: audio
+[05:54:57 INFO] Preparing extractor: subject_id
+2026-05-09 05:54:57 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:54:57 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.73s/it]100%|██████████| 1/1 [00:01<00:00,  1.91s/it]
+INFO - Predicted 32 / 100 segments (32.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-incredibly-complex-and-fascinating-in-its-ability-to-convey-meaning-through-sounds,-words,-grammar-structures,-...11-0bc4aa7b/audio.mp3
+  Step 3/3: Done. Output shape: (32, 20484)
+            32 timesteps × 20484 cortical vertices
+
+    reward = 0.0319
+  Completion 4: Language is incredibly complex and fascinating in its ability to convey meaning ...
+Processing text: /tmp/tmpgphcjfws.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.59s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.59s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 99377.24it/s]
+[05:55:16 WARNING] Removing extractor video as there are no corresponding events
+[05:55:16 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/64 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.96it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.29it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.99it/s]
+  2%|▏         | 1/64 [00:03<03:51,  3.67s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:55,  3.68s/it][A 16%|█▌        | 10/64 [00:03<00:14,  3.63it/s]
+Computing word embeddings:  25%|██▌       | 4/16 [00:03<00:08,  1.36it/s][A 27%|██▋       | 17/64 [00:03<00:06,  6.98it/s]
+Computing word embeddings:  38%|███▊      | 6/16 [00:03<00:04,  2.27it/s][A 39%|███▉      | 25/64 [00:03<00:03, 11.90it/s] 52%|█████▏    | 33/64 [00:04<00:01, 17.84it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:04<00:01,  3.97it/s][A 64%|██████▍   | 41/64 [00:04<00:00, 24.46it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:04<00:00,  5.28it/s][A 77%|███████▋  | 49/64 [00:04<00:00, 30.99it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:04<00:00,  6.65it/s][A 89%|████████▉ | 57/64 [00:04<00:00, 37.92it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  8.23it/s][A100%|██████████| 64/64 [00:04<00:00, 14.23it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.55it/s]
+[05:55:21 INFO] Preparing extractor: audio
+[05:55:22 INFO] Preparing extractor: subject_id
+2026-05-09 05:55:22 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:55:23 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.72s/it]100%|██████████| 1/1 [00:01<00:00,  1.90s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-language-is-how-it-functions-in-the-human-brain.-The-left-hemisphere-of-the-brain-handles-spoken-...11-00064576/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0235
+  Step rewards: mean=0.0233  std=0.0106  min=0.0059  max=0.0319
+  loss=0.0005  KL=0.0012
+
+[Step 3/10]
+  Completion 1: One fascinating aspect of language is how it functions in the human brain. The l...
+Processing text: /tmp/tmpa69vlkvh.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.82s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.82s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/73 [00:00<?, ?it/s]Add context to words: 100%|██████████| 73/73 [00:00<00:00, 98705.41it/s]
+[05:55:44 WARNING] Removing extractor video as there are no corresponding events
+[05:55:44 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (81 events)...
+  0%|          | 0/67 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.99it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.26it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.97it/s]
+  1%|▏         | 1/67 [00:03<03:44,  3.40s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:54,  3.40s/it][A 13%|█▎        | 9/67 [00:03<00:16,  3.48it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:12,  1.08it/s][A 25%|██▌       | 17/67 [00:03<00:06,  7.53it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.07it/s][A 37%|███▋      | 25/67 [00:03<00:03, 12.47it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:03,  3.29it/s][A 49%|████▉     | 33/67 [00:03<00:01, 18.14it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  4.69it/s][A 61%|██████    | 41/67 [00:03<00:01, 24.80it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:04<00:00,  6.32it/s][A 73%|███████▎  | 49/67 [00:04<00:00, 31.01it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:04<00:00,  7.86it/s][A 85%|████████▌ | 57/67 [00:04<00:00, 38.28it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:04<00:00,  9.69it/s][A 97%|█████████▋| 65/67 [00:04<00:00, 45.68it/s]100%|██████████| 67/67 [00:04<00:00, 15.42it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.54it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  3.91it/s]
+[05:55:49 INFO] Preparing extractor: audio
+[05:55:50 INFO] Preparing extractor: subject_id
+2026-05-09 05:55:50 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:55:50 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.86s/it]100%|██████████| 1/1 [00:02<00:00,  2.04s/it]
+INFO - Predicted 37 / 100 segments (37.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-an-incredibly-fascinating-phenomenon-that-intertwines-with-our-brains-in-profound-ways.-The-way-we-communicate-...11-9ce4c028/audio.mp3
+  Step 3/3: Done. Output shape: (37, 20484)
+            37 timesteps × 20484 cortical vertices
+
+    reward = 0.0535
+  Completion 2: Language is an incredibly fascinating phenomenon that intertwines with our brain...
+Processing text: /tmp/tmpsnyc1cdq.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.47s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.48s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/69 [00:00<?, ?it/s]Add context to words: 100%|██████████| 69/69 [00:00<00:00, 100558.37it/s]
+[05:56:09 WARNING] Removing extractor video as there are no corresponding events
+[05:56:09 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (76 events)...
+  0%|          | 0/64 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.10it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.34it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.07it/s]
+  2%|▏         | 1/64 [00:03<03:57,  3.78s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:56,  3.78s/it][A 14%|█▍        | 9/64 [00:03<00:17,  3.14it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:13,  1.03s/it][A 27%|██▋       | 17/64 [00:04<00:06,  6.90it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:04<00:05,  1.90it/s][A 39%|███▉      | 25/64 [00:04<00:03, 11.48it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:04<00:02,  3.03it/s][A 52%|█████▏    | 33/64 [00:04<00:01, 17.03it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:04<00:01,  4.40it/s][A 64%|██████▍   | 41/64 [00:04<00:00, 23.31it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:04<00:00,  5.96it/s][A 77%|███████▋  | 49/64 [00:04<00:00, 29.77it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:04<00:00,  7.55it/s][A 89%|████████▉ | 57/64 [00:04<00:00, 35.81it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  9.03it/s][A100%|██████████| 64/64 [00:04<00:00, 13.69it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.42it/s]
+[05:56:14 INFO] Preparing extractor: audio
+[05:56:15 INFO] Preparing extractor: subject_id
+2026-05-09 05:56:15 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:56:15 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.83s/it]100%|██████████| 1/1 [00:02<00:00,  2.02s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-its-not-just-about-speaking-but-also-about-comprehending-complex-ideas,-emotions,-and-thoug...11-17d4cf15/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0136
+  Completion 3: Language is fascinating because it's not just about speaking but also about comp...
+Processing text: /tmp/tmpgdnha7wo.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.77s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.77s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/66 [00:00<?, ?it/s]Add context to words: 100%|██████████| 66/66 [00:00<00:00, 100626.70it/s]
+[05:56:34 WARNING] Removing extractor video as there are no corresponding events
+[05:56:34 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (72 events)...
+  0%|          | 0/62 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.18it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.30it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.06it/s]
+  2%|▏         | 1/62 [00:03<03:22,  3.33s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:49,  3.33s/it][A 15%|█▍        | 9/62 [00:03<00:14,  3.55it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.10it/s][A 27%|██▋       | 17/62 [00:03<00:05,  7.69it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:05,  2.12it/s][A 40%|████      | 25/62 [00:03<00:02, 12.72it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.36it/s][A 53%|█████▎    | 33/62 [00:03<00:01, 18.71it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  4.85it/s][A 66%|██████▌   | 41/62 [00:03<00:00, 25.30it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.44it/s][A 79%|███████▉  | 49/62 [00:04<00:00, 31.86it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:04<00:00,  8.07it/s][A 92%|█████████▏| 57/62 [00:04<00:00, 38.27it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  9.64it/s][A100%|██████████| 62/62 [00:04<00:00, 14.70it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.79it/s]
+[05:56:39 INFO] Preparing extractor: audio
+[05:56:40 INFO] Preparing extractor: subject_id
+2026-05-09 05:56:40 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:56:41 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.85s/it]100%|██████████| 1/1 [00:02<00:00,  2.07s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-allows-us-to-communicate-with-others,-share-experiences,-express-ideas,-and-even-create-...11-38afd0ed/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0391
+  Completion 4: Language is fascinating because it allows us to communicate with others, share e...
+Processing text: /tmp/tmps7lnfvlj.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.76s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.76s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/67 [00:00<?, ?it/s]Add context to words: 100%|██████████| 67/67 [00:00<00:00, 98568.35it/s]
+[05:57:00 WARNING] Removing extractor video as there are no corresponding events
+[05:57:00 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/58 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/15 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.16it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.29it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.05it/s]
+  2%|▏         | 1/58 [00:03<03:09,  3.32s/it]
+Computing word embeddings:   7%|▋         | 1/15 [00:03<00:46,  3.32s/it][A 21%|██        | 12/58 [00:03<00:09,  4.83it/s]
+Computing word embeddings:  27%|██▋       | 4/15 [00:03<00:07,  1.48it/s][A 33%|███▎      | 19/58 [00:03<00:04,  8.33it/s]
+Computing word embeddings:  40%|████      | 6/15 [00:03<00:03,  2.46it/s][A 45%|████▍     | 26/58 [00:03<00:02, 12.60it/s]
+Computing word embeddings:  53%|█████▎    | 8/15 [00:03<00:01,  3.63it/s][A 57%|█████▋    | 33/58 [00:03<00:01, 17.49it/s]
+Computing word embeddings:  67%|██████▋   | 10/15 [00:03<00:01,  5.00it/s][A 71%|███████   | 41/58 [00:03<00:00, 23.93it/s]
+Computing word embeddings:  80%|████████  | 12/15 [00:03<00:00,  6.49it/s][A 84%|████████▍ | 49/58 [00:04<00:00, 30.79it/s]
+Computing word embeddings:  93%|█████████▎| 14/15 [00:04<00:00,  8.06it/s][A 98%|█████████▊| 57/58 [00:04<00:00, 37.43it/s]100%|██████████| 58/58 [00:04<00:00, 13.93it/s]
+Computing word embeddings: 100%|██████████| 15/15 [00:04<00:00,  3.60it/s]
+[05:57:04 INFO] Preparing extractor: audio
+[05:57:06 INFO] Preparing extractor: subject_id
+2026-05-09 05:57:06 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:57:06 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.89s/it]100%|██████████| 1/1 [00:02<00:00,  2.09s/it]
+INFO - Predicted 37 / 100 segments (37.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-not-only-serves-as-a-tool-for-communication-but-also-plays-a-critical-role-in-shaping-ou...11-86dd3a47/audio.mp3
+  Step 3/3: Done. Output shape: (37, 20484)
+            37 timesteps × 20484 cortical vertices
+
+    reward = 0.0331
+  Step rewards: mean=0.0348  std=0.0143  min=0.0136  max=0.0535
+  loss=0.0005  KL=0.0012
+
+[Step 4/10]
+  Completion 1: Language is fascinating because it not only serves as a tool for communication b...
+Processing text: /tmp/tmp5rn9yhhh.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.33s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.33s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/69 [00:00<?, ?it/s]Add context to words: 100%|██████████| 69/69 [00:00<00:00, 94423.16it/s]
+[05:57:27 WARNING] Removing extractor video as there are no corresponding events
+[05:57:27 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/62 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.21it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.31it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.08it/s]
+  2%|▏         | 1/62 [00:03<03:22,  3.32s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:49,  3.33s/it][A 15%|█▍        | 9/62 [00:03<00:14,  3.56it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.10it/s][A 34%|███▍      | 21/62 [00:03<00:04,  9.69it/s]
+Computing word embeddings:  38%|███▊      | 6/16 [00:03<00:03,  2.61it/s][A 47%|████▋     | 29/62 [00:03<00:02, 14.49it/s]
+Computing word embeddings:  50%|█████     | 8/16 [00:03<00:02,  3.79it/s][A 60%|█████▉    | 37/62 [00:03<00:01, 19.94it/s]
+Computing word embeddings:  62%|██████▎   | 10/16 [00:03<00:01,  5.13it/s][A 73%|███████▎  | 45/62 [00:03<00:00, 25.83it/s]
+Computing word embeddings:  75%|███████▌  | 12/16 [00:03<00:00,  6.58it/s][A 85%|████████▌ | 53/62 [00:04<00:00, 31.86it/s]
+Computing word embeddings:  88%|████████▊ | 14/16 [00:04<00:00,  8.07it/s][A 98%|█████████▊| 61/62 [00:04<00:00, 38.90it/s]100%|██████████| 62/62 [00:04<00:00, 14.72it/s]
+
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  9.87it/s][AComputing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.79it/s]
+[05:57:32 INFO] Preparing extractor: audio
+[05:57:33 INFO] Preparing extractor: subject_id
+2026-05-09 05:57:33 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:57:33 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-language-and-the-human-mind-is-the-intricate-relationship-between-the-two.-The-brains-ability-to-...11-b136713f/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0281
+  Completion 2: One fascinating aspect of language and the human mind is the intricate relations...
+Processing text: /tmp/tmp6jl5ma4m.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.99s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.99s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/67 [00:00<?, ?it/s]Add context to words: 100%|██████████| 67/67 [00:00<00:00, 101855.15it/s]
+[05:57:53 WARNING] Removing extractor video as there are no corresponding events
+[05:57:53 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/62 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.49it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.21it/s]
+  2%|▏         | 1/62 [00:03<03:17,  3.24s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:48,  3.24s/it][A 15%|█▍        | 9/62 [00:03<00:14,  3.65it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.13it/s][A 27%|██▋       | 17/62 [00:03<00:05,  7.85it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:05,  2.16it/s][A 40%|████      | 25/62 [00:03<00:02, 13.04it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.44it/s][A 53%|█████▎    | 33/62 [00:03<00:01, 19.14it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  4.94it/s][A 66%|██████▌   | 41/62 [00:03<00:00, 25.89it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.60it/s][A 79%|███████▉  | 49/62 [00:03<00:00, 32.63it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.28it/s][A 92%|█████████▏| 57/62 [00:04<00:00, 38.47it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  9.69it/s][A100%|██████████| 62/62 [00:04<00:00, 15.03it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.88it/s]
+[05:57:57 INFO] Preparing extractor: audio
+[05:57:59 INFO] Preparing extractor: subject_id
+2026-05-09 05:57:59 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:57:59 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]100%|██████████| 1/1 [00:02<00:00,  2.10s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-an-incredibly-complex-system-that-enables-humans-to-communicate-effectively-across-vast-distances,-from-our-anc...11-f32fc059/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0726
+  Completion 3: Language is an incredibly complex system that enables humans to communicate effe...
+Processing text: /tmp/tmp4w0971jd.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.93s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.93s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 102447.08it/s]
+[05:58:18 WARNING] Removing extractor video as there are no corresponding events
+[05:58:18 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/64 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.22it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.45it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.19it/s]
+  2%|▏         | 1/64 [00:03<03:20,  3.19s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.19s/it][A 14%|█▍        | 9/64 [00:03<00:14,  3.70it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.14it/s][A 27%|██▋       | 17/64 [00:03<00:05,  8.02it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.21it/s][A 39%|███▉      | 25/64 [00:03<00:02, 13.25it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.50it/s][A 52%|█████▏    | 33/64 [00:03<00:01, 19.33it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  4.99it/s][A 64%|██████▍   | 41/64 [00:03<00:00, 26.00it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.63it/s][A 77%|███████▋  | 49/64 [00:03<00:00, 32.31it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.18it/s][A 89%|████████▉ | 57/64 [00:04<00:00, 38.15it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  9.63it/s][A100%|██████████| 64/64 [00:04<00:00, 15.55it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.88it/s]
+[05:58:22 INFO] Preparing extractor: audio
+[05:58:24 INFO] Preparing extractor: subject_id
+2026-05-09 05:58:24 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:58:24 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.88s/it]100%|██████████| 1/1 [00:02<00:00,  2.12s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-not-only-allows-us-to-communicate-but-also-shapes-our-thoughts,-emotions,-and-perspectiv...11-990b223c/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0656
+  Completion 4: Language is fascinating because it not only allows us to communicate but also sh...
+Processing text: /tmp/tmpmotpakz4.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.44s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.44s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/70 [00:00<?, ?it/s]Add context to words: 100%|██████████| 70/70 [00:00<00:00, 94557.58it/s]
+[05:58:42 WARNING] Removing extractor video as there are no corresponding events
+[05:58:42 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/55 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/14 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.58it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.27it/s]
+  2%|▏         | 1/55 [00:03<02:54,  3.23s/it]
+Computing word embeddings:   7%|▋         | 1/14 [00:03<00:42,  3.24s/it][A 16%|█▋        | 9/55 [00:03<00:12,  3.67it/s]
+Computing word embeddings:  21%|██▏       | 3/14 [00:03<00:09,  1.14it/s][A 31%|███       | 17/55 [00:03<00:04,  7.96it/s]
+Computing word embeddings:  36%|███▌      | 5/14 [00:03<00:04,  2.20it/s][A 45%|████▌     | 25/55 [00:03<00:02, 13.29it/s]
+Computing word embeddings:  50%|█████     | 7/14 [00:03<00:01,  3.51it/s][A 60%|██████    | 33/55 [00:03<00:01, 19.57it/s]
+Computing word embeddings:  64%|██████▍   | 9/14 [00:03<00:00,  5.05it/s][A 75%|███████▍  | 41/55 [00:03<00:00, 26.57it/s]
+Computing word embeddings:  79%|███████▊  | 11/14 [00:03<00:00,  6.78it/s][A 89%|████████▉ | 49/55 [00:03<00:00, 33.37it/s]
+Computing word embeddings:  93%|█████████▎| 13/14 [00:03<00:00,  8.45it/s][A100%|██████████| 55/55 [00:03<00:00, 13.95it/s]
+Computing word embeddings: 100%|██████████| 14/14 [00:03<00:00,  3.55it/s]
+[05:58:47 INFO] Preparing extractor: audio
+[05:58:48 INFO] Preparing extractor: subject_id
+2026-05-09 05:58:48 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:58:49 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-both-language-and-the-human-brain-is-that-our-ability-to-communicate-through-language-allows-us-t...11-fbb8b6fc/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0148
+  *** New best reward: 0.0726 ***
+  Step rewards: mean=0.0453  std=0.0244  min=0.0148  max=0.0726
+  loss=0.0030  KL=0.0012
+
+[Step 5/10]
+  Completion 1: One fascinating aspect of both language and the human brain is that our ability ...
+Processing text: /tmp/tmpfd6u7ygu.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.71s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.71s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/75 [00:00<?, ?it/s]Add context to words: 100%|██████████| 75/75 [00:00<00:00, 95267.35it/s]
+[05:59:10 WARNING] Removing extractor video as there are no corresponding events
+[05:59:10 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (80 events)...
+  0%|          | 0/71 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/18 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.23it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.57it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.27it/s]
+  1%|▏         | 1/71 [00:03<03:42,  3.18s/it]
+Computing word embeddings:   6%|▌         | 1/18 [00:03<00:54,  3.19s/it][A 13%|█▎        | 9/71 [00:03<00:16,  3.73it/s]
+Computing word embeddings:  17%|█▋        | 3/18 [00:03<00:12,  1.15it/s][A 28%|██▊       | 20/71 [00:03<00:05,  9.85it/s]
+Computing word embeddings:  33%|███▎      | 6/18 [00:03<00:04,  2.72it/s][A 39%|███▉      | 28/71 [00:03<00:02, 14.94it/s]
+Computing word embeddings:  44%|████▍     | 8/18 [00:03<00:02,  3.92it/s][A 51%|█████     | 36/71 [00:03<00:01, 20.79it/s]
+Computing word embeddings:  56%|█████▌    | 10/18 [00:03<00:01,  5.31it/s][A 61%|██████    | 43/71 [00:03<00:01, 25.72it/s]
+Computing word embeddings:  67%|██████▋   | 12/18 [00:03<00:00,  6.77it/s][A 70%|███████   | 50/71 [00:03<00:00, 31.04it/s]
+Computing word embeddings:  78%|███████▊  | 14/18 [00:03<00:00,  8.32it/s][A 80%|████████  | 57/71 [00:04<00:00, 35.56it/s]
+Computing word embeddings:  89%|████████▉ | 16/18 [00:04<00:00,  9.82it/s][A 92%|█████████▏| 65/71 [00:04<00:00, 41.85it/s]100%|██████████| 71/71 [00:04<00:00, 16.92it/s]
+
+Computing word embeddings: 100%|██████████| 18/18 [00:04<00:00, 11.34it/s][AComputing word embeddings: 100%|██████████| 18/18 [00:04<00:00,  4.29it/s]
+[05:59:14 INFO] Preparing extractor: audio
+[05:59:16 INFO] Preparing extractor: subject_id
+2026-05-09 05:59:16 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:59:16 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]100%|██████████| 1/1 [00:02<00:00,  2.13s/it]
+INFO - Predicted 33 / 100 segments (33.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-and-the-human-brain-are-intricately-linked-in-fascinating-ways.-Language-is-our-primary-tool-for-communication-wit...11-87b0f8b7/audio.mp3
+  Step 3/3: Done. Output shape: (33, 20484)
+            33 timesteps × 20484 cortical vertices
+
+    reward = 0.0426
+  Completion 2: Language and the human brain are intricately linked in fascinating ways. Languag...
+Processing text: /tmp/tmp29_8k3z2.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.61s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.61s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/73 [00:00<?, ?it/s]Add context to words: 100%|██████████| 73/73 [00:00<00:00, 99539.72it/s]
+[05:59:34 WARNING] Removing extractor video as there are no corresponding events
+[05:59:34 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (79 events)...
+  0%|          | 0/68 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.22it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.56it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.26it/s]
+  1%|▏         | 1/68 [00:03<03:33,  3.19s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:51,  3.19s/it][A 13%|█▎        | 9/68 [00:03<00:15,  3.71it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:12,  1.15it/s][A 25%|██▌       | 17/68 [00:03<00:06,  8.04it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.21it/s][A 37%|███▋      | 25/68 [00:03<00:03, 13.33it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:02,  3.51it/s][A 49%|████▊     | 33/68 [00:03<00:01, 19.57it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  5.07it/s][A 60%|██████    | 41/68 [00:03<00:01, 26.14it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:03<00:00,  6.66it/s][A 72%|███████▏  | 49/68 [00:03<00:00, 32.82it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:03<00:00,  8.31it/s][A 84%|████████▍ | 57/68 [00:04<00:00, 39.06it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:04<00:00,  9.85it/s][A 96%|█████████▌| 65/68 [00:04<00:00, 45.15it/s]100%|██████████| 68/68 [00:04<00:00, 16.49it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.32it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  4.12it/s]
+[05:59:39 INFO] Preparing extractor: audio
+[05:59:40 INFO] Preparing extractor: subject_id
+2026-05-09 05:59:40 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[05:59:40 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]100%|██████████| 1/1 [00:02<00:00,  2.08s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-and-the-human-brain-are-complex-systems-that-enable-communication-across-cultures-and-time-periods.-The-brains-neu...11-3c1ca940/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0407
+  Completion 3: Language and the human brain are complex systems that enable communication acros...
+Processing text: /tmp/tmpwmqdtl4e.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.67s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.67s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/69 [00:00<?, ?it/s]Add context to words: 100%|██████████| 69/69 [00:00<00:00, 96276.44it/s]
+[05:59:59 WARNING] Removing extractor video as there are no corresponding events
+[05:59:59 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/63 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.59it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.28it/s]
+  2%|▏         | 1/63 [00:03<03:15,  3.16s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.17s/it][A 14%|█▍        | 9/63 [00:03<00:14,  3.75it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.16it/s][A 27%|██▋       | 17/63 [00:03<00:05,  8.14it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.24it/s][A 40%|███▉      | 25/63 [00:03<00:02, 13.47it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.55it/s][A 52%|█████▏    | 33/63 [00:03<00:01, 19.57it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.05it/s][A 65%|██████▌   | 41/63 [00:03<00:00, 26.36it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.73it/s][A 78%|███████▊  | 49/63 [00:03<00:00, 33.37it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.48it/s][A 90%|█████████ | 57/63 [00:03<00:00, 40.60it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00, 10.25it/s][A100%|██████████| 63/63 [00:04<00:00, 15.74it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.99it/s]
+[06:00:03 INFO] Preparing extractor: audio
+[06:00:05 INFO] Preparing extractor: subject_id
+2026-05-09 06:00:05 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:00:05 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-language-and-the-human-brain-is-the-capacity-for-metaphorical-expression.-The-ability-to-convey-i...11-7f469de8/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0419
+  Completion 4: One fascinating aspect of language and the human brain is the capacity for metap...
+Processing text: /tmp/tmp047ex384.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.09s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.09s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 100742.76it/s]
+[06:00:24 WARNING] Removing extractor video as there are no corresponding events
+[06:00:24 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (77 events)...
+  0%|          | 0/63 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.19it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.75it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.39it/s]
+  2%|▏         | 1/63 [00:03<03:15,  3.15s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.16s/it][A 14%|█▍        | 9/63 [00:03<00:14,  3.76it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.16it/s][A 27%|██▋       | 17/63 [00:03<00:05,  8.15it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.25it/s][A 40%|███▉      | 25/63 [00:03<00:02, 13.56it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.58it/s][A 52%|█████▏    | 33/63 [00:03<00:01, 19.63it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.07it/s][A 65%|██████▌   | 41/63 [00:03<00:00, 26.04it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.65it/s][A 78%|███████▊  | 49/63 [00:03<00:00, 32.81it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.31it/s][A 90%|█████████ | 57/63 [00:03<00:00, 39.27it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00,  9.90it/s][A100%|██████████| 63/63 [00:04<00:00, 15.66it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.97it/s]
+[06:00:29 INFO] Preparing extractor: audio
+[06:00:30 INFO] Preparing extractor: subject_id
+2026-05-09 06:00:30 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:00:30 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]100%|██████████| 1/1 [00:02<00:00,  2.13s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-its-not-just-a-system-of-sounds-but-an-incredibly-complex-network-that-allows-for-communica...11-15042154/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0542
+  Step rewards: mean=0.0449  std=0.0054  min=0.0407  max=0.0542
+  loss=0.0006  KL=0.0012
+
+[Step 6/10]
+  Completion 1: Language is fascinating because it's not just a system of sounds but an incredib...
+Processing text: /tmp/tmphh8eqjoe.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.59s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.59s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 81840.08it/s]
+[06:00:52 WARNING] Removing extractor video as there are no corresponding events
+[06:00:52 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/61 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.17it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.64it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.30it/s]
+  2%|▏         | 1/61 [00:03<03:06,  3.11s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.12s/it][A 18%|█▊        | 11/61 [00:03<00:10,  4.70it/s]
+Computing word embeddings:  25%|██▌       | 4/16 [00:03<00:07,  1.58it/s][A 28%|██▊       | 17/61 [00:03<00:05,  7.93it/s]
+Computing word embeddings:  38%|███▊      | 6/16 [00:03<00:03,  2.64it/s][A 41%|████      | 25/61 [00:03<00:02, 13.39it/s]
+Computing word embeddings:  50%|█████     | 8/16 [00:03<00:02,  3.93it/s][A 54%|█████▍    | 33/61 [00:03<00:01, 19.81it/s]
+Computing word embeddings:  62%|██████▎   | 10/16 [00:03<00:01,  5.35it/s][A 67%|██████▋   | 41/61 [00:03<00:00, 26.25it/s]
+Computing word embeddings:  75%|███████▌  | 12/16 [00:03<00:00,  6.87it/s][A 80%|████████  | 49/61 [00:03<00:00, 32.55it/s]
+Computing word embeddings:  88%|████████▊ | 14/16 [00:03<00:00,  8.42it/s][A 93%|█████████▎| 57/61 [00:03<00:00, 38.87it/s]100%|██████████| 61/61 [00:03<00:00, 15.40it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:03<00:00,  4.04it/s]
+[06:00:56 INFO] Preparing extractor: audio
+[06:00:58 INFO] Preparing extractor: subject_id
+2026-05-09 06:00:58 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:00:58 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.94s/it]100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-and-the-brain-have-a-fascinating-connection,-with-both-functions-deeply-interconnected.-The-brain-is-incredibly-ve...11-54033489/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0288
+  Completion 2: Language and the brain have a fascinating connection, with both functions deeply...
+Processing text: /tmp/tmpxoewqbzz.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.00s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.00s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/66 [00:00<?, ?it/s]Add context to words: 100%|██████████| 66/66 [00:00<00:00, 92274.69it/s]
+[06:01:17 WARNING] Removing extractor video as there are no corresponding events
+[06:01:17 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (72 events)...
+  0%|          | 0/63 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.19it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.66it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.32it/s]
+  2%|▏         | 1/63 [00:03<03:10,  3.08s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.08s/it][A 14%|█▍        | 9/63 [00:03<00:14,  3.82it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.18it/s][A 27%|██▋       | 17/63 [00:03<00:05,  8.26it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.28it/s][A 40%|███▉      | 25/63 [00:03<00:02, 13.58it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.58it/s][A 52%|█████▏    | 33/63 [00:03<00:01, 19.79it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.12it/s][A 65%|██████▌   | 41/63 [00:03<00:00, 26.70it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.83it/s][A 78%|███████▊  | 49/63 [00:03<00:00, 34.30it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.73it/s][A 90%|█████████ | 57/63 [00:03<00:00, 40.87it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00, 10.27it/s][A100%|██████████| 63/63 [00:03<00:00, 16.04it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:03<00:00,  4.07it/s]
+[06:01:21 INFO] Preparing extractor: audio
+[06:01:23 INFO] Preparing extractor: subject_id
+2026-05-09 06:01:23 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:01:23 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.94s/it]100%|██████████| 1/1 [00:02<00:00,  2.13s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-in-its-ability-to-convey-complex-ideas-with-precision-and-efficiency,-while-the-brains-neural-netwo...11-2bb6882f/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0614
+  Completion 3: Language is fascinating in its ability to convey complex ideas with precision an...
+Processing text: /tmp/tmpg8wung3r.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.36s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.36s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/73 [00:00<?, ?it/s]Add context to words: 100%|██████████| 73/73 [00:00<00:00, 92140.89it/s]
+[06:01:41 WARNING] Removing extractor video as there are no corresponding events
+[06:01:41 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (78 events)...
+  0%|          | 0/70 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/18 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.21it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.67it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.33it/s]
+  1%|▏         | 1/70 [00:03<03:34,  3.11s/it]
+Computing word embeddings:   6%|▌         | 1/18 [00:03<00:53,  3.12s/it][A 13%|█▎        | 9/70 [00:03<00:16,  3.77it/s]
+Computing word embeddings:  17%|█▋        | 3/18 [00:03<00:12,  1.17it/s][A 24%|██▍       | 17/70 [00:03<00:06,  8.11it/s]
+Computing word embeddings:  28%|██▊       | 5/18 [00:03<00:05,  2.23it/s][A 36%|███▌      | 25/70 [00:03<00:03, 13.32it/s]
+Computing word embeddings:  39%|███▉      | 7/18 [00:03<00:03,  3.51it/s][A 47%|████▋     | 33/70 [00:03<00:01, 19.40it/s]
+Computing word embeddings:  50%|█████     | 9/18 [00:03<00:01,  5.02it/s][A 59%|█████▊    | 41/70 [00:03<00:01, 25.80it/s]
+Computing word embeddings:  61%|██████    | 11/18 [00:03<00:01,  6.58it/s][A 70%|███████   | 49/70 [00:03<00:00, 33.20it/s]
+Computing word embeddings:  72%|███████▏  | 13/18 [00:03<00:00,  8.42it/s][A 81%|████████▏ | 57/70 [00:03<00:00, 40.53it/s]
+Computing word embeddings:  83%|████████▎ | 15/18 [00:03<00:00, 10.23it/s][A 93%|█████████▎| 65/70 [00:04<00:00, 45.32it/s]
+Computing word embeddings:  94%|█████████▍| 17/18 [00:04<00:00, 11.39it/s][A100%|██████████| 70/70 [00:04<00:00, 16.98it/s]
+Computing word embeddings: 100%|██████████| 18/18 [00:04<00:00,  4.37it/s]
+[06:01:46 INFO] Preparing extractor: audio
+[06:01:47 INFO] Preparing extractor: subject_id
+2026-05-09 06:01:47 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:01:47 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.95s/it]100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-language-and-the-human-brain-is-that-our-ability-to-create-and-understand-complex-words-and-phras...11-2afbcd6d/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0567
+  Completion 4: One fascinating aspect of language and the human brain is that our ability to cr...
+Processing text: /tmp/tmpgchkauxt.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.47s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.47s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 98314.82it/s]
+[06:02:05 WARNING] Removing extractor video as there are no corresponding events
+[06:02:05 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (76 events)...
+  0%|          | 0/61 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.21it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.76it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.40it/s]
+  2%|▏         | 1/61 [00:03<03:00,  3.01s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:45,  3.02s/it][A 15%|█▍        | 9/61 [00:03<00:13,  3.91it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:10,  1.21it/s][A 28%|██▊       | 17/61 [00:03<00:05,  8.46it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.33it/s][A 41%|████      | 25/61 [00:03<00:02, 14.07it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.72it/s][A 54%|█████▍    | 33/61 [00:03<00:01, 20.27it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.23it/s][A 67%|██████▋   | 41/61 [00:03<00:00, 26.80it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.84it/s][A 80%|████████  | 49/61 [00:03<00:00, 33.02it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.36it/s][A 93%|█████████▎| 57/61 [00:03<00:00, 38.83it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00,  9.80it/s][A100%|██████████| 61/61 [00:03<00:00, 15.67it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:03<00:00,  4.11it/s]
+[06:02:10 INFO] Preparing extractor: audio
+[06:02:11 INFO] Preparing extractor: subject_id
+2026-05-09 06:02:11 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:02:11 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+INFO - Predicted 30 / 100 segments (30.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-how-our-minds-process-information-is-that-the-human-brain-can-generate-new-words-through-both-con...11-bbc1f55f/audio.mp3
+  Step 3/3: Done. Output shape: (30, 20484)
+            30 timesteps × 20484 cortical vertices
+
+    reward = 0.0433
+  Step rewards: mean=0.0475  std=0.0127  min=0.0288  max=0.0614
+  loss=0.0016  KL=0.0013
+
+[Step 7/10]
+  Completion 1: One fascinating aspect of how our minds process information is that the human br...
+Processing text: /tmp/tmpu_zo27ky.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.28s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.28s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 100285.75it/s]
+[06:02:32 WARNING] Removing extractor video as there are no corresponding events
+[06:02:32 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/64 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.21it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.61it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.30it/s]
+  2%|▏         | 1/64 [00:03<03:16,  3.11s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.12s/it][A 14%|█▍        | 9/64 [00:03<00:14,  3.73it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.15it/s][A 27%|██▋       | 17/64 [00:03<00:05,  8.02it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.21it/s][A 44%|████▍     | 28/64 [00:03<00:02, 15.69it/s]
+Computing word embeddings:  50%|█████     | 8/16 [00:03<00:01,  4.14it/s][A 56%|█████▋    | 36/64 [00:03<00:01, 21.77it/s]
+Computing word embeddings:  62%|██████▎   | 10/16 [00:03<00:01,  5.55it/s][A 69%|██████▉   | 44/64 [00:03<00:00, 28.25it/s]
+Computing word embeddings:  75%|███████▌  | 12/16 [00:03<00:00,  7.20it/s][A 81%|████████▏ | 52/64 [00:03<00:00, 35.11it/s]
+Computing word embeddings:  88%|████████▊ | 14/16 [00:03<00:00,  8.66it/s][A 94%|█████████▍| 60/64 [00:03<00:00, 40.63it/s]100%|██████████| 64/64 [00:04<00:00, 15.92it/s]
+
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00, 10.03it/s][AComputing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.97it/s]
+[06:02:36 INFO] Preparing extractor: audio
+[06:02:38 INFO] Preparing extractor: subject_id
+2026-05-09 06:02:38 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:02:38 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]100%|██████████| 1/1 [00:02<00:00,  2.12s/it]
+INFO - Predicted 32 / 100 segments (32.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-not-only-allows-us-to-communicate-but-also-deeply-influences-our-thoughts-and-emotions.-...11-47b27fab/audio.mp3
+  Step 3/3: Done. Output shape: (32, 20484)
+            32 timesteps × 20484 cortical vertices
+
+    reward = 0.1351
+  Completion 2: Language is fascinating because it not only allows us to communicate but also de...
+Processing text: /tmp/tmpvzz2mq8o.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.14s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.14s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/74 [00:00<?, ?it/s]Add context to words: 100%|██████████| 74/74 [00:00<00:00, 101730.09it/s]
+[06:02:57 WARNING] Removing extractor video as there are no corresponding events
+[06:02:57 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (79 events)...
+  0%|          | 0/61 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.21it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.77it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.41it/s]
+  2%|▏         | 1/61 [00:03<03:06,  3.11s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.11s/it][A 15%|█▍        | 9/61 [00:03<00:13,  3.79it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.17it/s][A 28%|██▊       | 17/61 [00:03<00:05,  8.14it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.24it/s][A 41%|████      | 25/61 [00:03<00:02, 13.49it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.56it/s][A 54%|█████▍    | 33/61 [00:03<00:01, 19.87it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.13it/s][A 67%|██████▋   | 41/61 [00:03<00:00, 26.24it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.69it/s][A 80%|████████  | 49/61 [00:03<00:00, 32.82it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.32it/s][A 93%|█████████▎| 57/61 [00:03<00:00, 38.65it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00,  9.74it/s][A100%|██████████| 61/61 [00:03<00:00, 15.27it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:03<00:00,  4.00it/s]
+[06:03:02 INFO] Preparing extractor: audio
+[06:03:03 INFO] Preparing extractor: subject_id
+2026-05-09 06:03:03 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:03:03 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+INFO - Predicted 35 / 100 segments (35.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-incredibly-fascinating-not-just-because-its-one-of-our-most-fundamental-cognitive-abilities,-but-also-due-to-it...11-79346a6b/audio.mp3
+  Step 3/3: Done. Output shape: (35, 20484)
+            35 timesteps × 20484 cortical vertices
+
+    reward = 0.0352
+  Completion 3: Language is incredibly fascinating not just because it's one of our most fundame...
+Processing text: /tmp/tmpzw0nlqui.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.35s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.35s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/70 [00:00<?, ?it/s]Add context to words: 100%|██████████| 70/70 [00:00<00:00, 100617.30it/s]
+[06:03:23 WARNING] Removing extractor video as there are no corresponding events
+[06:03:23 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (75 events)...
+  0%|          | 0/67 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.19it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.74it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.38it/s]
+  1%|▏         | 1/67 [00:03<03:24,  3.10s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:49,  3.11s/it][A 13%|█▎        | 9/67 [00:03<00:15,  3.82it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:11,  1.18it/s][A 25%|██▌       | 17/67 [00:03<00:06,  8.28it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.28it/s][A 37%|███▋      | 25/67 [00:03<00:03, 13.63it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:02,  3.59it/s][A 49%|████▉     | 33/67 [00:03<00:01, 19.74it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  5.10it/s][A 61%|██████    | 41/67 [00:03<00:00, 26.43it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:03<00:00,  6.74it/s][A 73%|███████▎  | 49/67 [00:03<00:00, 33.64it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:03<00:00,  8.52it/s][A 85%|████████▌ | 57/67 [00:03<00:00, 40.43it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:03<00:00, 10.21it/s][A 97%|█████████▋| 65/67 [00:04<00:00, 46.33it/s]100%|██████████| 67/67 [00:04<00:00, 16.65it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.70it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  4.22it/s]
+[06:03:27 INFO] Preparing extractor: audio
+[06:03:28 INFO] Preparing extractor: subject_id
+2026-05-09 06:03:29 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:03:29 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]100%|██████████| 1/1 [00:02<00:00,  2.10s/it]
+INFO - Predicted 33 / 100 segments (33.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-as-it-not-only-allows-us-to-communicate-with-each-other-but-also-shapes-our-thoughts,-beliefs,-and-...11-ee4088da/audio.mp3
+  Step 3/3: Done. Output shape: (33, 20484)
+            33 timesteps × 20484 cortical vertices
+
+    reward = 0.0209
+  Completion 4: Language is fascinating as it not only allows us to communicate with each other ...
+Processing text: /tmp/tmp43dz_t1g.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.54s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.54s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/70 [00:00<?, ?it/s]Add context to words: 100%|██████████| 70/70 [00:00<00:00, 90394.48it/s]
+[06:03:47 WARNING] Removing extractor video as there are no corresponding events
+[06:03:47 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/67 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.77it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.40it/s]
+  1%|▏         | 1/67 [00:03<03:28,  3.16s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:50,  3.17s/it][A 13%|█▎        | 9/67 [00:03<00:15,  3.76it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:12,  1.16it/s][A 25%|██▌       | 17/67 [00:03<00:06,  8.14it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.24it/s][A 37%|███▋      | 25/67 [00:03<00:03, 13.41it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:02,  3.54it/s][A 49%|████▉     | 33/67 [00:03<00:01, 19.58it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  5.07it/s][A 61%|██████    | 41/67 [00:03<00:00, 26.04it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:03<00:00,  6.64it/s][A 73%|███████▎  | 49/67 [00:03<00:00, 33.03it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:03<00:00,  8.37it/s][A 85%|████████▌ | 57/67 [00:03<00:00, 39.62it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:03<00:00, 10.02it/s][A 97%|█████████▋| 65/67 [00:04<00:00, 46.66it/s]100%|██████████| 67/67 [00:04<00:00, 16.44it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.74it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  4.17it/s]
+[06:03:52 INFO] Preparing extractor: audio
+[06:03:53 INFO] Preparing extractor: subject_id
+2026-05-09 06:03:53 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:03:53 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+INFO - Predicted 33 / 100 segments (33.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-and-the-human-brain-are-intricately-connected-in-fascinating-ways.-Language-is-not-just-an-expression-of-thoughts-...11-df82909d/audio.mp3
+  Step 3/3: Done. Output shape: (33, 20484)
+            33 timesteps × 20484 cortical vertices
+
+    reward = 0.0019
+  *** New best reward: 0.1351 ***
+  Step rewards: mean=0.0483  std=0.0515  min=0.0019  max=0.1351
+  loss=0.0135  KL=0.0013
+
+[Step 8/10]
+  Completion 1: Language and the human brain are intricately connected in fascinating ways. Lang...
+Processing text: /tmp/tmpkkdjip94.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.63s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.63s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/70 [00:00<?, ?it/s]Add context to words: 100%|██████████| 70/70 [00:00<00:00, 94254.02it/s]
+[06:04:15 WARNING] Removing extractor video as there are no corresponding events
+[06:04:15 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/63 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.21it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.77it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.41it/s]
+  2%|▏         | 1/63 [00:03<03:12,  3.10s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.11s/it][A 14%|█▍        | 9/63 [00:03<00:14,  3.78it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.17it/s][A 27%|██▋       | 17/63 [00:03<00:05,  8.11it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.23it/s][A 46%|████▌     | 29/63 [00:03<00:02, 15.93it/s]
+Computing word embeddings:  50%|█████     | 8/16 [00:03<00:01,  4.16it/s][A 59%|█████▊    | 37/63 [00:03<00:01, 21.57it/s]
+Computing word embeddings:  62%|██████▎   | 10/16 [00:03<00:01,  5.55it/s][A 71%|███████▏  | 45/63 [00:03<00:00, 27.55it/s]
+Computing word embeddings:  75%|███████▌  | 12/16 [00:03<00:00,  7.02it/s][A 84%|████████▍ | 53/63 [00:03<00:00, 34.01it/s]
+Computing word embeddings:  88%|████████▊ | 14/16 [00:03<00:00,  8.62it/s][A 97%|█████████▋| 61/63 [00:03<00:00, 40.28it/s]100%|██████████| 63/63 [00:03<00:00, 15.75it/s]
+
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00, 10.20it/s][AComputing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  4.00it/s]
+[06:04:20 INFO] Preparing extractor: audio
+[06:04:21 INFO] Preparing extractor: subject_id
+2026-05-09 06:04:21 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:04:22 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.95s/it]100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+INFO - Predicted 31 / 100 segments (31.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-of-the-most-fascinating-aspects-of-human-cognition-is-how-our-brains-process-language,-which-we-use-to-communicate-with...11-98a9836d/audio.mp3
+  Step 3/3: Done. Output shape: (31, 20484)
+            31 timesteps × 20484 cortical vertices
+
+    reward = 0.0382
+  Completion 2: One of the most fascinating aspects of human cognition is how our brains process...
+Processing text: /tmp/tmp2q8tavh4.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.77s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.77s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/67 [00:00<?, ?it/s]Add context to words: 100%|██████████| 67/67 [00:00<00:00, 90012.29it/s]
+[06:04:41 WARNING] Removing extractor video as there are no corresponding events
+[06:04:41 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/66 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.19it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.74it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.38it/s]
+  2%|▏         | 1/66 [00:03<03:24,  3.14s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:50,  3.15s/it][A 14%|█▎        | 9/66 [00:03<00:15,  3.77it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:12,  1.17it/s][A 26%|██▌       | 17/66 [00:03<00:06,  8.10it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.23it/s][A 38%|███▊      | 25/66 [00:03<00:03, 13.39it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:02,  3.53it/s][A 50%|█████     | 33/66 [00:03<00:01, 19.73it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  5.10it/s][A 62%|██████▏   | 41/66 [00:03<00:00, 26.49it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:03<00:00,  6.76it/s][A 74%|███████▍  | 49/66 [00:03<00:00, 33.40it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:03<00:00,  8.47it/s][A 86%|████████▋ | 57/66 [00:03<00:00, 39.79it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:03<00:00, 10.01it/s][A 98%|█████████▊| 65/66 [00:04<00:00, 45.34it/s]100%|██████████| 66/66 [00:04<00:00, 16.19it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.50it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  4.17it/s]
+[06:04:45 INFO] Preparing extractor: audio
+[06:04:47 INFO] Preparing extractor: subject_id
+2026-05-09 06:04:47 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:04:47 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.94s/it]100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-incredibly-complex-and-fascinating,-intricately-linked-to-our-ability-to-communicate-across-cultures-and-contin...11-5397f631/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0486
+  Completion 3: Language is incredibly complex and fascinating, intricately linked to our abilit...
+Processing text: /tmp/tmpsztiwfcl.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.71s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.71s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 99067.06it/s]
+[06:05:06 WARNING] Removing extractor video as there are no corresponding events
+[06:05:06 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (76 events)...
+  0%|          | 0/66 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.71it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.36it/s]
+  2%|▏         | 1/66 [00:03<03:23,  3.12s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:50,  3.13s/it][A 14%|█▎        | 9/66 [00:03<00:15,  3.76it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:12,  1.16it/s][A 26%|██▌       | 17/66 [00:03<00:06,  8.12it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.24it/s][A 38%|███▊      | 25/66 [00:03<00:03, 13.46it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:02,  3.55it/s][A 50%|█████     | 33/66 [00:03<00:01, 19.63it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  5.07it/s][A 62%|██████▏   | 41/66 [00:03<00:00, 26.21it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:03<00:00,  6.68it/s][A 74%|███████▍  | 49/66 [00:03<00:00, 32.36it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:03<00:00,  8.20it/s][A 86%|████████▋ | 57/66 [00:03<00:00, 39.62it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:03<00:00, 10.03it/s][A 98%|█████████▊| 65/66 [00:04<00:00, 46.04it/s]100%|██████████| 66/66 [00:04<00:00, 16.20it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.65it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  4.17it/s]
+[06:05:11 INFO] Preparing extractor: audio
+[06:05:12 INFO] Preparing extractor: subject_id
+2026-05-09 06:05:12 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:05:12 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.98s/it]100%|██████████| 1/1 [00:02<00:00,  2.18s/it]
+INFO - Predicted 38 / 100 segments (38.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-an-incredibly-complex-phenomenon-that-involves-not-only-our-ability-to-communicate-but-also-our-understanding-o...11-58977a6d/audio.mp3
+  Step 3/3: Done. Output shape: (38, 20484)
+            38 timesteps × 20484 cortical vertices
+
+    reward = 0.0356
+  Completion 4: Language is an incredibly complex phenomenon that involves not only our ability ...
+Processing text: /tmp/tmpubdfmpcs.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.46s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.46s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 91443.63it/s]
+[06:05:31 WARNING] Removing extractor video as there are no corresponding events
+[06:05:31 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (73 events)...
+  0%|          | 0/63 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.72it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.37it/s]
+  2%|▏         | 1/63 [00:03<03:16,  3.17s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.17s/it][A 14%|█▍        | 9/63 [00:03<00:14,  3.70it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.14it/s][A 27%|██▋       | 17/63 [00:03<00:05,  7.94it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:05,  2.19it/s][A 40%|███▉      | 25/63 [00:03<00:02, 13.15it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.47it/s][A 52%|█████▏    | 33/63 [00:03<00:01, 19.14it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  4.93it/s][A 65%|██████▌   | 41/63 [00:03<00:00, 25.35it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.47it/s][A 78%|███████▊  | 49/63 [00:03<00:00, 31.63it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.01it/s][A 90%|█████████ | 57/63 [00:04<00:00, 37.24it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  9.37it/s][A100%|██████████| 63/63 [00:04<00:00, 15.27it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.87it/s]
+[06:05:36 INFO] Preparing extractor: audio
+[06:05:38 INFO] Preparing extractor: subject_id
+2026-05-09 06:05:38 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:05:38 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.98s/it]100%|██████████| 1/1 [00:02<00:00,  2.18s/it]
+INFO - Predicted 33 / 100 segments (33.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-of-the-most-fascinating-aspects-of-both-language-and-the-human-brain-is-their-intricate-interplay.-The-human-brain-proc...11-8c2d42b1/audio.mp3
+  Step 3/3: Done. Output shape: (33, 20484)
+            33 timesteps × 20484 cortical vertices
+
+    reward = 0.0344
+  Step rewards: mean=0.0392  std=0.0056  min=0.0344  max=0.0486
+  loss=0.0009  KL=0.0012
+
+[Step 9/10]
+  Completion 1: One of the most fascinating aspects of both language and the human brain is thei...
+Processing text: /tmp/tmps7v2pgsv.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.67s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.67s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 99969.39it/s]
+[06:06:00 WARNING] Removing extractor video as there are no corresponding events
+[06:06:00 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (74 events)...
+  0%|          | 0/61 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.18it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.63it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.30it/s]
+  2%|▏         | 1/61 [00:03<03:10,  3.17s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.18s/it][A 15%|█▍        | 9/61 [00:03<00:13,  3.73it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.16it/s][A 28%|██▊       | 17/61 [00:03<00:05,  8.05it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.22it/s][A 41%|████      | 25/61 [00:03<00:02, 13.40it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.54it/s][A 54%|█████▍    | 33/61 [00:03<00:01, 19.37it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.00it/s][A 67%|██████▋   | 41/61 [00:03<00:00, 26.23it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.70it/s][A 80%|████████  | 49/61 [00:03<00:00, 32.98it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.36it/s][A 93%|█████████▎| 57/61 [00:03<00:00, 40.55it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00, 10.26it/s][A100%|██████████| 61/61 [00:04<00:00, 15.20it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.99it/s]
+[06:06:04 INFO] Preparing extractor: audio
+[06:06:06 INFO] Preparing extractor: subject_id
+2026-05-09 06:06:06 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:06:06 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.99s/it]100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-and-the-human-brain-have-a-fascinating-relationship,-as-both-play-critical-roles-in-communication-and-cognition.-L...11-be65f2da/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0333
+  Completion 2: Language and the human brain have a fascinating relationship, as both play criti...
+Processing text: /tmp/tmphrg9j7s7.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.07s/it]Extracting words from audio: 100%|██████████| 1/1 [00:15<00:00, 15.07s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 98044.92it/s]
+[06:06:26 WARNING] Removing extractor video as there are no corresponding events
+[06:06:26 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (75 events)...
+  0%|          | 0/62 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.18it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.63it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.30it/s]
+  2%|▏         | 1/62 [00:03<03:13,  3.17s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.18s/it][A 15%|█▍        | 9/62 [00:03<00:14,  3.71it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.15it/s][A 27%|██▋       | 17/62 [00:03<00:05,  7.99it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.20it/s][A 40%|████      | 25/62 [00:03<00:02, 13.14it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.46it/s][A 53%|█████▎    | 33/62 [00:03<00:01, 19.16it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  4.95it/s][A 66%|██████▌   | 41/62 [00:03<00:00, 25.94it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.62it/s][A 79%|███████▉  | 49/62 [00:03<00:00, 32.76it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.32it/s][A 92%|█████████▏| 57/62 [00:04<00:00, 39.46it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00, 10.01it/s][A100%|██████████| 62/62 [00:04<00:00, 15.25it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.93it/s]
+[06:06:30 INFO] Preparing extractor: audio
+[06:06:32 INFO] Preparing extractor: subject_id
+2026-05-09 06:06:32 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:06:32 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.97s/it]100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-its-our-primary-means-of-communication-with-others-across-cultures.-The-human-brain-has-evo...11-deb8dcfc/audio.mp3
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0426
+  Completion 3: Language is fascinating because it's our primary means of communication with oth...
+Processing text: /tmp/tmpu1r7npwe.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.89s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.89s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/70 [00:00<?, ?it/s]Add context to words: 100%|██████████| 70/70 [00:00<00:00, 99089.19it/s]
+[06:06:51 WARNING] Removing extractor video as there are no corresponding events
+[06:06:51 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (75 events)...
+  0%|          | 0/65 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/17 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.18it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.61it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.29it/s]
+  2%|▏         | 1/65 [00:03<03:23,  3.18s/it]
+Computing word embeddings:   6%|▌         | 1/17 [00:03<00:51,  3.19s/it][A 14%|█▍        | 9/65 [00:03<00:15,  3.70it/s]
+Computing word embeddings:  18%|█▊        | 3/17 [00:03<00:12,  1.15it/s][A 26%|██▌       | 17/65 [00:03<00:05,  8.01it/s]
+Computing word embeddings:  29%|██▉       | 5/17 [00:03<00:05,  2.21it/s][A 38%|███▊      | 25/65 [00:03<00:03, 13.24it/s]
+Computing word embeddings:  41%|████      | 7/17 [00:03<00:02,  3.49it/s][A 51%|█████     | 33/65 [00:03<00:01, 19.55it/s]
+Computing word embeddings:  53%|█████▎    | 9/17 [00:03<00:01,  5.05it/s][A 63%|██████▎   | 41/65 [00:03<00:00, 25.81it/s]
+Computing word embeddings:  65%|██████▍   | 11/17 [00:03<00:00,  6.58it/s][A 75%|███████▌  | 49/65 [00:03<00:00, 32.72it/s]
+Computing word embeddings:  76%|███████▋  | 13/17 [00:03<00:00,  8.29it/s][A 88%|████████▊ | 57/65 [00:04<00:00, 39.07it/s]
+Computing word embeddings:  88%|████████▊ | 15/17 [00:04<00:00,  9.85it/s][A100%|██████████| 65/65 [00:04<00:00, 45.65it/s]100%|██████████| 65/65 [00:04<00:00, 15.77it/s]
+
+Computing word embeddings: 100%|██████████| 17/17 [00:04<00:00, 11.66it/s][AComputing word embeddings: 100%|██████████| 17/17 [00:04<00:00,  4.12it/s]
+[06:06:55 INFO] Preparing extractor: audio
+[06:06:57 INFO] Preparing extractor: subject_id
+2026-05-09 06:06:57 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:06:57 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:02<00:00,  2.01s/it]100%|██████████| 1/1 [00:02<00:00,  2.20s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=One-fascinating-aspect-of-both-language-and-the-human-brain-is-the-intricate-connection-between-them.-Language-serves-as-th...11-530fa8a6/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0421
+  Completion 4: One fascinating aspect of both language and the human brain is the intricate con...
+Processing text: /tmp/tmp9_nnai9i.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.65s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.65s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/72 [00:00<?, ?it/s]Add context to words: 100%|██████████| 72/72 [00:00<00:00, 99404.18it/s]
+[06:07:16 WARNING] Removing extractor video as there are no corresponding events
+[06:07:16 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (75 events)...
+  0%|          | 0/62 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.14it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.56it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.24it/s]
+  2%|▏         | 1/62 [00:03<03:08,  3.09s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.10s/it][A 15%|█▍        | 9/62 [00:03<00:13,  3.82it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.18it/s][A 27%|██▋       | 17/62 [00:03<00:05,  8.23it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.27it/s][A 40%|████      | 25/62 [00:03<00:02, 13.61it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.59it/s][A 53%|█████▎    | 33/62 [00:03<00:01, 19.87it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.14it/s][A 66%|██████▌   | 41/62 [00:03<00:00, 26.54it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.78it/s][A 79%|███████▉  | 49/62 [00:03<00:00, 33.84it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.57it/s][A 92%|█████████▏| 57/62 [00:03<00:00, 40.19it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00, 10.14it/s][A100%|██████████| 62/62 [00:03<00:00, 15.69it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:03<00:00,  4.05it/s]
+[06:07:20 INFO] Preparing extractor: audio
+[06:07:21 INFO] Preparing extractor: subject_id
+2026-05-09 06:07:21 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:07:22 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.96s/it]100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+INFO - Predicted 32 / 100 segments (32.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-an-incredibly-fascinating-aspect-of-human-behavior-and-cognitive-processes,-with-its-roots-in-our-ability-to-co...11-775ad50f/audio.mp3
+  Step 3/3: Done. Output shape: (32, 20484)
+            32 timesteps × 20484 cortical vertices
+
+    reward = 0.0362
+  Step rewards: mean=0.0385  std=0.0039  min=0.0333  max=0.0426
+  loss=0.0003  KL=0.0010
+
+[Step 10/10]
+  Completion 1: Language is an incredibly fascinating aspect of human behavior and cognitive pro...
+Processing text: /tmp/tmpfm0wld1j.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.63s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.63s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/71 [00:00<?, ?it/s]Add context to words: 100%|██████████| 71/71 [00:00<00:00, 96686.88it/s]
+[06:07:43 WARNING] Removing extractor video as there are no corresponding events
+[06:07:43 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (77 events)...
+  0%|          | 0/64 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.19it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.56it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.25it/s]
+  2%|▏         | 1/64 [00:03<03:20,  3.19s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.20s/it][A 14%|█▍        | 9/64 [00:03<00:14,  3.72it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.15it/s][A 27%|██▋       | 17/64 [00:03<00:05,  8.06it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.22it/s][A 39%|███▉      | 25/64 [00:03<00:02, 13.35it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.52it/s][A 52%|█████▏    | 33/64 [00:03<00:01, 19.20it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  4.95it/s][A 64%|██████▍   | 41/64 [00:03<00:00, 25.87it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.62it/s][A 77%|███████▋  | 49/64 [00:03<00:00, 32.17it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.13it/s][A 89%|████████▉ | 57/64 [00:04<00:00, 38.88it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:04<00:00,  9.80it/s][A100%|██████████| 64/64 [00:04<00:00, 15.71it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.92it/s]
+[06:07:47 INFO] Preparing extractor: audio
+[06:07:49 INFO] Preparing extractor: subject_id
+2026-05-09 06:07:49 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:07:49 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:02<00:00,  2.02s/it]100%|██████████| 1/1 [00:02<00:00,  2.28s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-incredibly-complex-and-fascinating-from-an-evolutionary-standpoint,-allowing-us-to-communicate-with-each-other-...11-f1070946/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0052
+  Completion 2: Language is incredibly complex and fascinating from an evolutionary standpoint, ...
+Processing text: /tmp/tmpkoypchmv.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.47s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.47s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/68 [00:00<?, ?it/s]Add context to words: 100%|██████████| 68/68 [00:00<00:00, 98757.85it/s]
+[06:08:08 WARNING] Removing extractor video as there are no corresponding events
+[06:08:08 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (72 events)...
+  0%|          | 0/62 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.14it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.68it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.32it/s]
+  2%|▏         | 1/62 [00:03<03:13,  3.17s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:47,  3.18s/it][A 15%|█▍        | 9/62 [00:03<00:14,  3.73it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.16it/s][A 27%|██▋       | 17/62 [00:03<00:05,  8.13it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.24it/s][A 40%|████      | 25/62 [00:03<00:02, 13.45it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.55it/s][A 53%|█████▎    | 33/62 [00:03<00:01, 19.81it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.12it/s][A 66%|██████▌   | 41/62 [00:03<00:00, 26.37it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.72it/s][A 79%|███████▉  | 49/62 [00:03<00:00, 33.41it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.47it/s][A 92%|█████████▏| 57/62 [00:03<00:00, 39.01it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00,  9.83it/s][A100%|██████████| 62/62 [00:04<00:00, 15.36it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:04<00:00,  3.96it/s]
+[06:08:13 INFO] Preparing extractor: audio
+[06:08:14 INFO] Preparing extractor: subject_id
+2026-05-09 06:08:14 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:08:14 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.96s/it]100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+INFO - Predicted 34 / 100 segments (34.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-not-only-allows-us-to-communicate-but-also-creates-new-ways-of-thinking-and-understandin...11-7d9bd2bc/audio.mp3
+  Step 3/3: Done. Output shape: (34, 20484)
+            34 timesteps × 20484 cortical vertices
+
+    reward = 0.0684
+  Completion 3: Language is fascinating because it not only allows us to communicate but also cr...
+Processing text: /tmp/tmp658olncj.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.86s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.86s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/72 [00:00<?, ?it/s]Add context to words: 100%|██████████| 72/72 [00:00<00:00, 98689.51it/s]
+[06:08:33 WARNING] Removing extractor video as there are no corresponding events
+[06:08:33 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (77 events)...
+  0%|          | 0/59 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/15 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.20it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.77it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.40it/s]
+  2%|▏         | 1/59 [00:03<03:01,  3.14s/it]
+Computing word embeddings:   7%|▋         | 1/15 [00:03<00:44,  3.15s/it][A 15%|█▌        | 9/59 [00:03<00:13,  3.73it/s]
+Computing word embeddings:  20%|██        | 3/15 [00:03<00:10,  1.15it/s][A 29%|██▉       | 17/59 [00:03<00:05,  8.09it/s]
+Computing word embeddings:  33%|███▎      | 5/15 [00:03<00:04,  2.23it/s][A 42%|████▏     | 25/59 [00:03<00:02, 13.30it/s]
+Computing word embeddings:  47%|████▋     | 7/15 [00:03<00:02,  3.51it/s][A 56%|█████▌    | 33/59 [00:03<00:01, 19.36it/s]
+Computing word embeddings:  60%|██████    | 9/15 [00:03<00:01,  5.01it/s][A 69%|██████▉   | 41/59 [00:03<00:00, 26.02it/s]
+Computing word embeddings:  73%|███████▎  | 11/15 [00:03<00:00,  6.65it/s][A 83%|████████▎ | 49/59 [00:03<00:00, 32.84it/s]
+Computing word embeddings:  87%|████████▋ | 13/15 [00:03<00:00,  8.33it/s][A 97%|█████████▋| 57/59 [00:03<00:00, 39.68it/s]100%|██████████| 59/59 [00:03<00:00, 14.83it/s]
+
+Computing word embeddings: 100%|██████████| 15/15 [00:03<00:00, 10.05it/s][AComputing word embeddings: 100%|██████████| 15/15 [00:03<00:00,  3.77it/s]
+[06:08:38 INFO] Preparing extractor: audio
+[06:08:39 INFO] Preparing extractor: subject_id
+2026-05-09 06:08:39 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:08:40 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.97s/it]100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+INFO - Predicted 37 / 100 segments (37.0% kept)
+INFO - Wrote TTS audio to tribe-cache/tribev2.demo_utils.TextToEvents.get_events,0/text=Language-is-fascinating-because-it-allows-us-to-communicate-complex-ideas-across-cultures-and-time-periods.-The-brain,-on-t...11-94ff1f39/audio.mp3
+  Step 3/3: Done. Output shape: (37, 20484)
+            37 timesteps × 20484 cortical vertices
+
+    reward = 0.0028
+  Completion 4: Language is fascinating because it allows us to communicate complex ideas across...
+Processing text: /tmp/tmpa7v68oc0.txt
+  Step 1/3: Synthesising text to speech (gTTS)...
+Extracting words from audio:   0%|          | 0/1 [00:00<?, ?it/s]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.79s/it]Extracting words from audio: 100%|██████████| 1/1 [00:14<00:00, 14.79s/it]
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/neuralset/events/utils.py:134: UserWarning: The events dataframe contains an `Index` column. This is dangerous, please add drop=True in calls to df.reset_index(). Dropping it automatically.
+  warnings.warn(msg)
+Add context to words:   0%|          | 0/72 [00:00<?, ?it/s]Add context to words: 100%|██████████| 72/72 [00:00<00:00, 96205.76it/s]
+[06:08:58 WARNING] Removing extractor video as there are no corresponding events
+[06:08:58 INFO] Preparing extractor: text
+  Step 2/3: Running TRIBE inference (75 events)...
+  0%|          | 0/63 [00:00<?, ?it/s]
+Computing word embeddings:   0%|          | 0/16 [00:00<?, ?it/s][A
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A[A
+
+Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  2.23it/s][A[A
+
+Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.79it/s][A[ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.43it/s]
+  2%|▏         | 1/63 [00:03<03:13,  3.12s/it]
+Computing word embeddings:   6%|▋         | 1/16 [00:03<00:46,  3.13s/it][A 14%|█▍        | 9/63 [00:03<00:14,  3.77it/s]
+Computing word embeddings:  19%|█▉        | 3/16 [00:03<00:11,  1.17it/s][A 27%|██▋       | 17/63 [00:03<00:05,  8.12it/s]
+Computing word embeddings:  31%|███▏      | 5/16 [00:03<00:04,  2.24it/s][A 40%|███▉      | 25/63 [00:03<00:02, 13.42it/s]
+Computing word embeddings:  44%|████▍     | 7/16 [00:03<00:02,  3.54it/s][A 52%|█████▏    | 33/63 [00:03<00:01, 19.60it/s]
+Computing word embeddings:  56%|█████▋    | 9/16 [00:03<00:01,  5.07it/s][A 65%|██████▌   | 41/63 [00:03<00:00, 26.69it/s]
+Computing word embeddings:  69%|██████▉   | 11/16 [00:03<00:00,  6.82it/s][A 78%|███████▊  | 49/63 [00:03<00:00, 34.11it/s]
+Computing word embeddings:  81%|████████▏ | 13/16 [00:03<00:00,  8.64it/s][A 90%|█████████ | 57/63 [00:03<00:00, 41.53it/s]
+Computing word embeddings:  94%|█████████▍| 15/16 [00:03<00:00, 10.47it/s][A100%|██████████| 63/63 [00:03<00:00, 15.88it/s]
+Computing word embeddings: 100%|██████████| 16/16 [00:03<00:00,  4.03it/s]
+[06:09:03 INFO] Preparing extractor: audio
+[06:09:04 INFO] Preparing extractor: subject_id
+2026-05-09 06:09:04 - WARNING - neuralset.extractors.base:824 - LabelEncoder has only found one label: {'default'}. This was probably not intended.
+[06:09:05 INFO] Building dataloader for split all
+/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  0%|          | 0/1 [00:00<?, ?it/s]/home/users/shaunakm/miniconda3/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 20 worker processes in total. Our suggested max number of worker in current system is 18, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+100%|██████████| 1/1 [00:01<00:00,  1.96s/it]100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+INFO - Predicted 36 / 100 segments (36.0% kept)
+  Step 3/3: Done. Output shape: (36, 20484)
+            36 timesteps × 20484 cortical vertices
+
+    reward = 0.0785
+  Step rewards: mean=0.0387  std=0.0349  min=0.0028  max=0.0785
+  loss=-0.0026  KL=0.0012
+
+======================================================================
+Optimization complete.
+  Best reward     : 0.1351
+  Best completion :
+
+    One fascinating aspect of how our minds process information is that the human brain can generate new words through both conscious and unconscious processes. This ability to create or invent words (synesthesia) allows us to perceive sounds in unusual ways. For example, a person might hear their own name as "cat" when they speak it aloud, which isn't always immediately obvious but suggests they have developed this skill. Additionally
+
+Best completion saved to ./brain-optimize-output/best_completion.txt
+LoRA adapter saved to ./brain-optimize-output/lora-brain-adapter
+Metrics saved to ./brain-optimize-output/optimizer_metrics.json
+Training plot saved to ./brain-optimize-output/training_curves.png
+
+Rendering brain surface plot for best completion...
+Fetching fsaverage5 surface mesh (cached after first download)...
+Surface plot saved to ./brain-optimize-output/tribe_brain_surface.png
+Brain surface plot saved to ./brain-optimize-output/brain_surface_best.png
+
+=== Job completed at Sat May  9 06:09:18 PDT 2026 ===
